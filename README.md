@@ -1,5 +1,7 @@
 # Mono-Repo
 
+[![CI Status](https://github.com/lxfactorl/mono-repo/actions/workflows/notification-service-ci.yml/badge.svg)](https://github.com/lxfactorl/mono-repo/actions/workflows/notification-service-ci.yml)
+
 A monorepo for backend services and client-side applications, designed for deployment to [Railway](https://railway.app).
 
 ## Repository Structure
