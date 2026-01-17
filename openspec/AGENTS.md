@@ -12,6 +12,17 @@ Instructions for AI coding assistants using OpenSpec for spec-driven development
 - Validate: `openspec validate [change-id] --strict --no-interactive` and fix issues
 - Request approval: Do not start implementation until proposal is approved
 
+## Git Workflow Rules
+
+> **CRITICAL**: Never push directly to `master`. All changes MUST go through a spec branch and pull request.
+
+- **Branch naming**: `spec/<change-id>` (e.g., `spec/add-user-auth`)
+- **Workflow**: Create branch → Implement → Push branch → Create PR → Merge to master
+- **Enforcement**: OpenSpec workflows gate on branch status:
+  - `openspec-apply`: Creates/switches to spec branch before implementation
+  - `openspec-archive`: Verifies branch is merged before archiving
+  - `openspec-proposal`: Blocks new proposals if active spec exists
+
 ## Three-Stage Workflow
 
 ### Stage 1: Creating Changes

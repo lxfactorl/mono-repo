@@ -13,6 +13,10 @@ Use `@/openspec/AGENTS.md` to learn:
 - Spec format and conventions
 - Project structure and guidelines
 
+## Git Workflow
+
+> **CRITICAL**: Never push directly to `master`. All changes must go through a spec branch (`spec/<change-id>`) and pull request.
+
 Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
