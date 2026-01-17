@@ -427,6 +427,14 @@ Only add complexity with:
 | Read specific files | Read | Direct file access |
 | Explore unknown scope | Task | Multi-step investigation |
 
+## Specialized Skills
+
+| Skill | Use Case | Capability |
+|-------|----------|------------|
+| `github-expert` | Repo management | Search code, manage issues/PRs, read files, commit changes |
+| `microsoft-code-reference` | SDK validation | Find correct classes/methods, verify signatures, get code samples |
+| `microsoft-docs` | Documentation | Search concepts, tutorials, architecture guides, and best practices |
+
 ## Error Recovery
 
 ### Change Conflicts
