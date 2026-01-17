@@ -12,3 +12,4 @@
 ## 3. Documentation & Enforcement
 - [x] 3.1 Update `openspec/project.md` to document the CI pipeline and required status checks
 - [x] 3.2 Verify the pipeline runs on a dummy PR (or locally via act/manual trigger)
+- [x] 3.3 Implement **Monorepo Gate** workflow (`ci-gate.yml`) to orchestrate service checks and provide a single status check for branch protection.
