@@ -50,4 +50,11 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public void TestGate_ShouldFail_ToValidateCIBlocking()
+    {
+        // This test intentionally fails to verify CI blocks merge
+        Assert.True(false, "TEST: This failure should block merge");
+    }
 }

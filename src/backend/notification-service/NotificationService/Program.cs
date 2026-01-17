@@ -11,10 +11,4 @@ app.ConfigurePipeline();
 
 app.Run();
 
-// TEST: This should cause build to fail and block merge
-var undeclaredVariable = nonExistentMethod();
-
-// INTENTIONAL SYNTAX ERROR TO TEST BUILD GATE
-ThisWillNotCompile();
-
 public partial class Program { }
