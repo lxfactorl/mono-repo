@@ -10,6 +10,7 @@ description: Scaffold a new OpenSpec change and validate strictly.
 - Do not write any code during the proposal stage. Only create design documents (proposal.md, tasks.md, design.md, and spec deltas). Implementation happens in the apply stage after approval.
 
 **Steps**
+0. **Git Workflow Gate**: Before creating a new proposal, run `openspec list` and check for any active (non-archived) changes in `openspec/changes/`. If an active change exists, STOP and inform the user: "Cannot create new proposal — active change `<id>` must be archived first." Only proceed if no active changes exist.
 1. Review `openspec/project.md`, run `openspec list` and `openspec list --specs`, and inspect related code or docs (e.g., via `rg`/`ls`) to ground the proposal in current behaviour; note any gaps that require clarification.
 2. Choose a unique verb-led `change-id` and scaffold `proposal.md`, `tasks.md`, and `design.md` (when needed) under `openspec/changes/<id>/`.
 3. Map the change into concrete capabilities or requirements, breaking multi-scope efforts into distinct spec deltas with clear relationships and sequencing.

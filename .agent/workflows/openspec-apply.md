@@ -9,6 +9,7 @@ description: Implement an approved OpenSpec change and keep tasks in sync.
 
 **Steps**
 Track these steps as TODOs and complete them one by one.
+0. **Git Workflow Gate**: Check current branch with `git branch --show-current`. If on `master`, create and switch to a spec branch: `git checkout -b spec/<change-id>`. If already on a matching spec branch, proceed. If on a different branch, STOP and ask the user to confirm branch management.
 1. Read `changes/<id>/proposal.md`, `design.md` (if present), and `tasks.md` to confirm scope and acceptance criteria.
 2. Work through tasks sequentially, keeping edits minimal and focused on the requested change.
 3. Confirm completion before updating statuses—make sure every item in `tasks.md` is finished.

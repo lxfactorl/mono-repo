@@ -14,9 +14,10 @@ description: Archive a deployed OpenSpec change and update specs.
    - Otherwise, review the conversation, run `openspec list`, and ask the user which change to archive; wait for a confirmed change ID before proceeding.
    - If you still cannot identify a single change ID, stop and tell the user you cannot archive anything yet.
 2. Validate the change ID by running `openspec list` (or `openspec show <id>`) and stop if the change is missing, already archived, or otherwise not ready to archive.
-3. Run `openspec archive <id> --yes` so the CLI moves the change and applies spec updates without prompts (use `--skip-specs` only for tooling-only work).
-4. Review the command output to confirm the target specs were updated and the change landed in `changes/archive/`.
-5. Validate with `openspec validate --strict --no-interactive` and inspect with `openspec show <id>` if anything looks off.
+3. **Git Workflow Gate**: Verify the spec branch `spec/<id>` has been merged to `master` by running `git branch --merged master | grep spec/<id>`. If the branch is NOT merged, STOP and inform the user: "Cannot archive — branch `spec/<id>` must be merged to master first via pull request."
+4. Run `openspec archive <id> --yes` so the CLI moves the change and applies spec updates without prompts (use `--skip-specs` only for tooling-only work).
+5. Review the command output to confirm the target specs were updated and the change landed in `changes/archive/`.
+6. Validate with `openspec validate --strict --no-interactive` and inspect with `openspec show <id>` if anything looks off.
 
 **Reference**
 - Use `openspec list` to confirm change IDs before archiving.
