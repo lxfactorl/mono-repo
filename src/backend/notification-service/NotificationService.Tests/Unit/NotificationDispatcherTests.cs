@@ -50,4 +50,11 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public void Gate_ShouldBlock_WhenTestFails()
+    {
+        // This test MUST fail and the CI gate MUST block merge
+        Assert.Fail("GATE BLOCK TEST: Merge must be blocked by branch protection");
+    }
 }
