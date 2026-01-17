@@ -1,0 +1,62 @@
+name: .NET CI Template
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+      project_path:
+        required: true
+        type: string
+      coverage_threshold:
+        required: false
+        type: number
+        default: 80
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ${{ inputs.project_path }}
+
+      - name: Format Check
+        run: dotnet format --verify-no-changes
+        working-directory: ${{ inputs.project_path }}
+
+      - name: Security Scan
+        run: dotnet list package --vulnerable --include-transitive
+        working-directory: ${{ inputs.project_path }}
+
+      - name: Build
+        run: dotnet build --no-restore /p:TreatWarningsAsErrors=true
+        working-directory: ${{ inputs.project_path }}
+
+      - name: Test
+        run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
+        working-directory: ${{ inputs.project_path }}
+
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Verify Coverage
+        run: |
+          reportgenerator -reports:${{ inputs.project_path }}/coverage/**/coverage.cobertura.xml -targetdir:./coveragereport -reporttypes:TextSummary
+          COVERAGE=$(grep "Line coverage:" ./coveragereport/Summary.txt | awk '{print $3}' | sed 's/%//')
+          echo "Line Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < ${{ inputs.coverage_threshold }}" | bc -l) )); then
+            echo "❌ Coverage $COVERAGE% is below required threshold ${{ inputs.coverage_threshold }}%"
+            exit 1
+          fi
+          echo "✅ Coverage $COVERAGE% meets threshold"
