@@ -4,7 +4,7 @@ using NotificationService.Domain.Models;
 
 namespace NotificationService.Infrastructure.Providers;
 
-public class LoggingProvider : INotificationProvider
+internal class LoggingProvider : INotificationProvider
 {
     private readonly ILogger<LoggingProvider> _logger;
 

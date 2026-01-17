@@ -5,7 +5,7 @@ using NotificationService.Domain.Models;
 
 namespace NotificationService.Application.Services;
 
-public class NotificationDispatcher : INotificationDispatcher
+internal class NotificationDispatcher : INotificationDispatcher
 {
     private readonly IEnumerable<INotificationProvider> _providers;
     private readonly ILogger<NotificationDispatcher> _logger;

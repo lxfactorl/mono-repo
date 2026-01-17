@@ -22,6 +22,7 @@
 - [x] 3.5 Implement `AddValidatedOptions` and common bootstrap logic in `Shared.Infrastructure` (Implemented as `Infrastructure/Common`)
 - [x] 3.6 Integrate `Microsoft.AspNetCore.OpenApi` and `Scalar.AspNetCore`
 - [x] 3.7 Enrich OpenAPI metadata: add descriptions, status codes (202, 400), and XML comments for In/Out models
+- [x] 3.8 Refactor access modifiers: Enforce `internal` by default, using `InternalsVisibleTo` for tests
 
 ## 4. Validation & Testing
 - [x] 4.1 Unit tests for `NotificationDispatcher` and `LoggingProvider`

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NotificationService.Api.Models.Settings;
 
-public class AppNotificationSettings
+internal class AppNotificationSettings
 {
     [Required]
     public string ServiceName { get; init; } = "NotificationService";

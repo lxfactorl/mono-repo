@@ -27,6 +27,7 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - **Formatting**: EditorConfig for consistent formatting at the monorepo root.
 - **Naming**: PascalCase for public members, `_camelCase` for private fields.
 - **Documentation**: All public APIs MUST have XML documentation.
+- **Access Modifiers**: Default to `internal`. Only expose types as `public` if intended for external consumption. Use `InternalsVisibleTo` for testing.
 
 ### Architecture Patterns
 - **Monorepo Structure**:
@@ -43,6 +44,7 @@ Monorepo serving as the root for multiple backend services and client-side appli
   ```
 - **Service Architecture**:
   - **Framework**: ASP.NET Core **Minimal APIs** (no Controllers).
+  - **API Documentation**: **Scalar** (via `Scalar.AspNetCore`) for OpenAPI UI.
   - **Single Service Project**: Layers managed via namespaces and internal directory hierarchy.
   - **Modular DI**: Dependencies registered via extension methods in a `Bootstrap/` folder.
   - **Configuration**: Use "Validated Singleton Options" pattern (Data Annotations + `ValidateOnStart`).
