@@ -50,4 +50,11 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public void MonorepoGate_MustBlock_OnFailure()
+    {
+        // This test MUST fail
+        Assert.Fail("MONOREPO GATE TEST: Merge must be blocked by branch protection");
+    }
 }
