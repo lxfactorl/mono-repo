@@ -1,17 +1,16 @@
-name: monorepo-gate
+name: CI Gate
 
 on:
   pull_request:
-    branches: [ master ]
-  push:
     branches: [ master ]
 
 permissions:
   contents: read
   pull-requests: read
+  statuses: read
 
 jobs:
-  # 1. PATH FILTERS
+  # Path-based filtering to determine which services changed
   filter:
     runs-on: ubuntu-latest
     outputs:
@@ -29,41 +28,33 @@ jobs:
             - '.github/workflows/backend-notification-service.yml'
             - '.github/workflows/dotnet-ci.yml'
 
-  # 2. MONOREPO GATE (Single Required Check)
-  # This job runs the validation inline to ensure it's properly tracked by branch protection
-  monorepo-gate:
-    runs-on: ubuntu-latest
+  # Conditional validation for Notification Service
+  validate-notification-service:
     needs: filter
-    if: always()
+    if: needs.filter.outputs.notification_service == 'true'
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        if: needs.filter.outputs.notification_service == 'true'
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+      
       - name: Setup .NET
-        if: needs.filter.outputs.notification_service == 'true'
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
           dotnet-quality: 'preview'
         
-      - name: Restore Dependencies
-        if: needs.filter.outputs.notification_service == 'true'
+      - name: Restore
         run: dotnet restore
         working-directory: src/backend/notification-service
 
-      - name: Check Format
-        if: needs.filter.outputs.notification_service == 'true'
+      - name: Format Check
         run: dotnet format --verify-no-changes --severity warn
         working-directory: src/backend/notification-service
 
       - name: Build
-        if: needs.filter.outputs.notification_service == 'true'
         run: dotnet build --no-restore /p:TreatWarningsAsErrors=true
         working-directory: src/backend/notification-service
 
       - name: Security Audit
-        if: needs.filter.outputs.notification_service == 'true'
         run: |
           OUTPUT=$(dotnet list package --vulnerable --include-transitive 2>&1)
           echo "$OUTPUT"
@@ -74,12 +65,10 @@ jobs:
         working-directory: src/backend/notification-service
 
       - name: Test
-        if: needs.filter.outputs.notification_service == 'true'
         run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: src/backend/notification-service
 
-      - name: Verify Coverage
-        if: needs.filter.outputs.notification_service == 'true'
+      - name: Coverage Gate
         run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator -reports:./coverage/**/coverage.cobertura.xml -targetdir:./coverage/report -reporttypes:TextSummary
@@ -92,13 +81,29 @@ jobs:
           fi
         working-directory: src/backend/notification-service
 
-      - name: Gate Status
-        if: always()
+  # THE GATEKEEPER - This is the ONLY required check
+  # It waits for all other jobs and reports their collective status
+  gatekeeper:
+    runs-on: ubuntu-latest
+    needs: [filter, validate-notification-service]
+    if: always()
+    steps:
+      - name: Check All Jobs
         run: |
-          if [ "${{ needs.filter.outputs.notification_service }}" != "true" ]; then
-            echo "::notice::No services changed - gate passed (skipped validation)"
-            exit 0
+          echo "Filter: ${{ needs.filter.result }}"
+          echo "Notification Service: ${{ needs.validate-notification-service.result }}"
+          
+          # Filter must succeed
+          if [ "${{ needs.filter.result }}" != "success" ]; then
+            echo "::error::Filter job failed"
+            exit 1
           fi
           
-          # If we got here and notification_service was true, all steps passed
-          echo "::notice::Monorepo Gate Passed - All quality checks succeeded"
+          # Validate-notification-service can be skipped or success, but not failure/cancelled
+          NS_RESULT="${{ needs.validate-notification-service.result }}"
+          if [ "$NS_RESULT" == "failure" ] || [ "$NS_RESULT" == "cancelled" ]; then
+            echo "::error::Notification Service validation failed"
+            exit 1
+          fi
+          
+          echo "::notice::✅ All quality gates passed - PR is ready to merge"
