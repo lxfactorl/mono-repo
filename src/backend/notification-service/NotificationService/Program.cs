@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Builder;
+usiiing Microsoft.AspNetCore.Builder;
 using NotificationService.Bootstrap;
 
 var builder = WebApplication.CreateBuilder(args);
