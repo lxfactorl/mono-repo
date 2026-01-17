@@ -2,14 +2,14 @@
 
 ## Phase 1: Core Logic TDD (Isolated) - PR #1
 *Note: Must be merged before starting Phase 2*
-- [ ] Define internal `ITelegramMessenger` interface (Port) for sending messages
-- [ ] Create `TelegramProvider` class depending on `ITelegramMessenger` and `TelegramSettings`
-- [ ] Create `TelegramProviderTests`
-- [ ] **RED**: Write failing test: Provider throws if Settings are invalid/missing
-- [ ] **RED**: Write failing test: Provider formats message and calls `ITelegramMessenger.SendAsync`
-- [ ] **RED**: Write failing test: Provider logs and bubbles up errors when Messenger fails
-- [ ] **GREEN**: Implement `TelegramProvider` logic to pass tests (using mocks for Messenger)
-- [ ] **REFACTOR**: Polish provider logic
+- [x] Define internal `ITelegramMessenger` interface (Port) for sending messages
+- [x] Create `TelegramProvider` class depending on `ITelegramMessenger` and `TelegramSettings`
+- [x] Create `TelegramProviderTests`
+- [x] **RED**: Write failing test: Provider throws if Settings are invalid/missing
+- [x] **RED**: Write failing test: Provider formats message and calls `ITelegramMessenger.SendAsync`
+- [x] **RED**: Write failing test: Provider logs and bubbles up errors when Messenger fails
+- [x] **GREEN**: Implement `TelegramProvider` logic to pass tests (using mocks for Messenger)
+- [x] **REFACTOR**: Polish provider logic
 
 ## Phase 2: Integration & Adapter (The "Real World") - PR #2
 *Note: Must be merged before starting Phase 3*

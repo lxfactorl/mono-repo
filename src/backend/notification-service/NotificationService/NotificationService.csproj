@@ -6,4 +6,8 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.12.11" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotificationService.Tests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+  </ItemGroup>
 </Project>
