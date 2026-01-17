@@ -13,7 +13,7 @@
 
 ## Verification
 
-- [ ] **Validate README renders correctly**
-  - [ ] View README on GitHub after push
-  - [ ] Verify markdown formatting
+- [x] **Validate README renders correctly**
+  - [x] PR created: https://github.com/lxfactorl/mono-repo/pull/3
+  - [ ] Verify markdown formatting after merge
   - [ ] Confirm all links work (if any)
