@@ -50,4 +50,11 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public void Gatekeeper_MustBlock_OnTestFailure()
+    {
+        // This test MUST fail and the gatekeeper MUST block merge
+        Assert.Fail("GATEKEEPER TEST: Merge must be blocked by branch protection");
+    }
 }
