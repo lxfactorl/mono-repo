@@ -5,12 +5,16 @@ on:
     paths:
       - 'src/backend/notification-service/**'
       - 'Directory.Build.props'
+      - '.github/workflows/backend-notification-service.yml'
+      - '.github/workflows/templates/dotnet-ci.yml'
   push:
     branches:
       - master
     paths:
       - 'src/backend/notification-service/**'
       - 'Directory.Build.props'
+      - '.github/workflows/backend-notification-service.yml'
+      - '.github/workflows/templates/dotnet-ci.yml'
 
 jobs:
   ci:
