@@ -6,6 +6,10 @@ on:
   push:
     branches: [ master ]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   # 1. PATH FILTERS
   # Detect which services have changed in this PR/Commit
