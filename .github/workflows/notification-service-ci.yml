@@ -1,4 +1,4 @@
-name: Notification Service CI
+name: notification-service-quality-gate
 
 on:
   pull_request:
