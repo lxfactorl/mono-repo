@@ -24,6 +24,11 @@ This service folder is a self-contained unit:
 - **Internal by Default**: Logic is kept `internal` and only exposed to tests via `InternalsVisibleTo`.
 - **Validated Options**: Configuration uses the "Validated Singleton Options" pattern to ensure settings are correct at startup.
 
+### 4. Features
+- **Notification Providers**: Pluggable delivery channels.
+  - **Logging**: (Default) Writes notifications to console logs for development.
+  - **Telegram**: Sends messages via Telegram Bot API (requires `Telegram:BotToken` and `Telegram:ChatId`).
+
 ## Development
 
 To work on this service in isolation:
