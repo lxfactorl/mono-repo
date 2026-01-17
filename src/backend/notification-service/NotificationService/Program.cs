@@ -11,4 +11,7 @@ app.ConfigurePipeline();
 
 app.Run();
 
+// INTENTIONAL SYNTAX ERROR TO TEST BUILD GATE
+ThisWillNotCompile();
+
 public partial class Program { }
