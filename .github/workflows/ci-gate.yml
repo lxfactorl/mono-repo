@@ -32,6 +32,7 @@ jobs:
     needs: filter
     if: ${{ needs.filter.outputs.notification_service == 'true' }}
     uses: ./.github/workflows/backend-notification-service.yml
+    secrets: inherit # Pass secrets if needed
 
   # 3. THE MONOREPO GATE (Required Check)
   # This job ALWAYS runs. It depends on the conditional jobs.
