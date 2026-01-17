@@ -1,0 +1,39 @@
+# .NET build outputs
+bin/
+obj/
+publish/
+out/
+
+# IDE and Editor
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.idea/
+*.swp
+
+# NuGet
+*.nupkg
+.nuget/
+packages/
+
+# Test results
+TestResults/
+*.trx
+coverage/
+
+# OS generated
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+.cache/
