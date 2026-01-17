@@ -14,7 +14,7 @@ Track these steps as TODOs and complete them one by one.
 2. Work through tasks sequentially, keeping edits minimal and focused on the requested change.
 3. Confirm completion before updating statuses—make sure every item in `tasks.md` is finished.
 4. Update the checklist after all work is done so each task is marked `- [x]` and reflects reality.
-5. Push the spec branch and create a Pull Request to `master`. Use `/openspec-pr` to generate the PR description.
+5. Push the spec branch and create a Pull Request using GitHub CLI: `gh pr create --title "<type>: <description>" --body "<PR body>"`. Use `/openspec-pr` to generate the PR description if needed.
 6. **Wait for PR merge** — Archiving is a separate step that happens AFTER the PR is merged and deployment is verified.
 
 **Reference**
