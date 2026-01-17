@@ -17,6 +17,4 @@
     - [ ] 3.2.3 Verify **Formatting failure** blocks PR
     - [ ] 3.2.4 Verify **Test failure** blocks PR
     - [ ] 3.2.5 Verify **Coverage < 80%** blocks PR
-- [ ] 3.3 Verify **Administrator Bypass** is strictly disabled via Repository Ruleset
-- [ ] 3.4 Verify **Direct Pushes** to master are rejected
-- [ ] 3.5 Verify **Successful CI run** enables the Merge button
+- [ ] 3.3 Verify **Successful CI run** enables the Merge button
