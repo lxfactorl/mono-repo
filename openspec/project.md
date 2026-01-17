@@ -70,7 +70,10 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - Each service deployable independently via Railway
 - **CI/CD Pipeline**:
   - **Pattern**: **Per-Service CI Workflow** (e.g., `<Service> CI`). Each service has a dedicated workflow with path-based filtering.
-  - **Enforcement**: Each service's `validate` job is added as a required status check in GitHub Branch Protection.
+  - **Enforcement**: **GitHub Repository Rulesets** applied to the `master` branch.
+    - **Rule**: Require status checks to pass (e.g., `<Service> CI / validate`).
+    - **Rule**: Require a pull request before merging (Restricts direct pushes).
+    - **Rule**: Include administrators (Enforces rules even for repository owners).
   - **Gates**: Zero Warnings, Formatting (`dotnet format`), Security Audit, 80% Coverage threshold.
   - **Efficiency**: Path-based filtering ensures only affected services run CI on PRs.
 
