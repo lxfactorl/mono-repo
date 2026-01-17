@@ -42,6 +42,9 @@ Monorepo serving as the root for multiple backend services and client-side appli
   │   └── client/                     # Client applications
   │       └── <client-name>/
   ```
+- **Solution Management**:
+  - **Service Solutions**: Each service folder MUST contain a dedicated solution file (e.g., `<Service>.slnx`) including the service project and its test project.
+  - **Monorepo Solution**: The root-level solution (`Monorepo.sln`) MUST include all projects across the monorepo.
 - **Service Architecture**:
   - **Framework**: ASP.NET Core **Minimal APIs** (no Controllers).
   - **API Documentation**: **Scalar** (via `Scalar.AspNetCore`) for OpenAPI UI.
@@ -66,10 +69,10 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Each service deployable independently via Railway
 - **CI/CD Pipeline**:
-  - **Monorepo Gate**: A single status check (`Monorepo CI Gate / monorepo-gate`) is required for merging. It orchestrates service-specific checks.
-  - **Pattern**: Reusable Workflows (`.github/workflows/dotnet-ci.yml`) called by service-specific workflows, which are triggered by the gate.
-  - **Gates**: Zero Warnings, Formatting (`dotnet format`), Security Audit, 80% Coverage.
-  - **Triggers**: Path-based filtering ensures efficient execution per service.
+  - **Pattern**: **Per-Service CI Workflow** (e.g., `<Service> CI`). Each service has a dedicated workflow with path-based filtering.
+  - **Enforcement**: Each service's `validate` job is added as a required status check in GitHub Branch Protection.
+  - **Gates**: Zero Warnings, Formatting (`dotnet format`), Security Audit, 80% Coverage threshold.
+  - **Efficiency**: Path-based filtering ensures only affected services run CI on PRs.
 
 ## Domain Context
 This is a multi-service platform. Individual service domains will be documented in their respective `openspec/` directories. Root-level OpenSpec handles:
