@@ -51,3 +51,18 @@ The CI pipeline MUST scan all project dependencies for known security vulnerabil
 - **WHEN** a usage of a NuGet package with a known CVE is detected
 - **THEN** the pipeline fails
 - **AND** the vulnerability details are logged
+
+---
+
+### Requirement: Repository Ruleset Enforcement
+The system MUST use GitHub Repository Rulesets to enforce protection of the `master` branch.
+
+#### Scenario: Unauthorized direct push
+- **WHEN** a user (including administrators) attempts to `git push` directly to `master`
+- **THEN** the push MUST be rejected by GitHub
+- **AND** the user MUST be directed to create a Pull Request
+
+#### Scenario: Status checks failing on PR
+- **WHEN** one or more CI status checks fail for a PR
+- **THEN** the "Merge" button is disabled for all users, including administrators
+- **AND** the PR stays in a "Blocked" state until all status checks pass
