@@ -50,4 +50,11 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+
+    [Fact]
+    public void CI_Gate_Final_Test()
+    {
+        // FINAL TEST: This MUST block merge
+        Assert.Fail("CI must block merge - no duplicates, clean workflow");
+    }
 }
