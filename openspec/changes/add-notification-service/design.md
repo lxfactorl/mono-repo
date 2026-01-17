@@ -44,12 +44,13 @@ A centralized service to handle outbound notifications. The goal is to build the
   - **Clean Program.cs**: The entry point MUST delegate all setup to chained calls, many of which will come from the Shared Infrastructure.
   - **Modular DI**: Each domain or architectural layer manages its own extension classes.
 - **Project Structure**:
-  - `src/backend/shared/`: Monorepo-wide common code and patterns.
+  - **Standard**: Every service MUST consist of exactly two projects:
+    1. `<ServiceName>`: The executable service project containing all layers as namespaces.
+    2. `<ServiceName>.Tests`: The test project.
+  - **Internal Organization**: Layers (Domain, Application, Infrastructure) are managed via namespaces and directory structures within the single service project.
   - `src/backend/notification-service/`:
-    - `Notification.Api`: REST endpoints.
-    - `Notification.Domain`: Interfaces and Domain Models.
-    - `Notification.Infrastructure`: Concrete providers.
-    - `Notification.Application`: Delivery orchestration.
+    - `NotificationService/`: Single project containing all logic.
+    - `NotificationService.Tests/`: XUnit project for all testing tiers.
 
 ## Risks / Trade-offs
 - **Risk**: Abstraction might be too generic for channel-specific metadata.

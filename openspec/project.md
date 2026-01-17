@@ -22,10 +22,11 @@ Monorepo serving as the root for multiple backend services and client-side appli
 ## Project Conventions
 
 ### Code Style
-- EditorConfig for consistent formatting across all services
-- Roslyn analyzers enforced as errors in CI
-- Naming: PascalCase for public members, camelCase for private fields with `_` prefix
-- All public APIs must have XML documentation
+- **Zero Warning Policy**: `TreatWarningsAsErrors` enabled globally. Build MUST fail on any compiler warning.
+- **Analyzers**: Roslyn analyzers enforced as errors across all projects.
+- **Formatting**: EditorConfig for consistent formatting at the monorepo root.
+- **Naming**: PascalCase for public members, `_camelCase` for private fields.
+- **Documentation**: All public APIs MUST have XML documentation.
 
 ### Architecture Patterns
 - **Monorepo Structure**:
@@ -34,32 +35,27 @@ Monorepo serving as the root for multiple backend services and client-side appli
   ├── src/
   │   ├── backend/                    # .NET Core services
   │   │   └── <service-name>/
-  │   │       ├── <Service>.Api/
-  │   │       ├── <Service>.Application/
-  │   │       ├── <Service>.Domain/
-  │   │       ├── <Service>.Infrastructure/
-  │   │       └── <Service>.Tests/
+  │   │       ├── <Service>/          # Executable service (Api, App, Domain, Infra)
+  │   │       └── <Service>.Tests/    # XUnit project for all test tiers
   │   │
-  │   └── client/                     # Client applications (TBD)
+  │   └── client/                     # Client applications
   │       └── <client-name>/
-  │
-  └── openspec/                       # Centralized documentation
-      ├── project.md                  # This file - monorepo conventions
-      ├── AGENTS.md                   # AI assistant instructions
-      ├── specs/                      # All capability specs
-      │   ├── backend-<service>/      # Per-service specs
-      │   └── client-<client>/        # Per-client specs
-      └── changes/                    # Proposed changes
   ```
-- **Shared Configuration**: Root-level `.editorconfig`, `Directory.Build.props`, and analyzers apply to all services
+- **Service Architecture**:
+  - **Framework**: ASP.NET Core **Minimal APIs** (no Controllers).
+  - **Single Service Project**: Layers managed via namespaces and internal directory hierarchy.
+  - **Modular DI**: Dependencies registered via extension methods in a `Bootstrap/` folder.
+  - **Configuration**: Use "Validated Singleton Options" pattern (Data Annotations + `ValidateOnStart`).
+  - **Clean Program.cs**: Entry point delegates setup to chained extension methods.
+- **Shared Configuration**: Root-level `.editorconfig`, `Directory.Build.props`, and analyzers apply to all projects.
 - Domain-Driven Design principles where applicable
 
 ### Testing Strategy
-- xUnit as test framework
-- Minimum 80% code coverage threshold
-- Test projects mirror source structure
-- Integration tests for API endpoints
-- Unit tests for domain logic
+- **Framework**: xUnit with **NSubstitute** (mocking) and **FluentAssertions**.
+- **Coverage**: Minimum **80% line coverage** threshold enforced by CI gate.
+- **Tiers**:
+  - **Unit Tests**: Business logic isolation using `InternalsVisibleTo`.
+  - **E2E Tests**: Black-box validation using `WebApplicationFactory`.
 
 ### Git Workflow
 - Main branch protected, requires PR reviews
