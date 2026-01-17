@@ -22,8 +22,6 @@ jobs:
         filters: |
           service:
             - 'src/backend/notification-service/**'
-            - '.github/workflows/notification-service-ci.yml'
-            - '.github/workflows/template-dotnet-ci.yml'
 
   ci:
     needs: changes
