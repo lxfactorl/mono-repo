@@ -10,7 +10,7 @@ on:
 
 jobs:
   ci:
-    uses: ./.github/workflows/templates/template-dotnet-ci.yml
+    uses: ./.github/workflows/template-dotnet-ci.yml
     with:
       service_name: 'NotificationService'
       project_path: 'src/backend/notification-service'
