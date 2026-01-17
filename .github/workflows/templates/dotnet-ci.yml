@@ -27,14 +27,8 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x' # Using latest LTS/supported version available in runners
-        # Note: 'net10.0' in codebase seems prospective/future-proof placeholders. 
-        # In standardized CI environment, we typically map to available SDKs.
-        # Assuming net9.0/net8.0 or preview for now. 
-        # Since user props said net10.0, I will use '10.0.x' if available or allow quality to fail if sdk missing?
-        # Re-checking props: <TargetFramework>net10.0</TargetFramework>.
-        # This implies we need a preview or it's a future scenario. I will stick to '9.0.x' and install preview if needed or assume user environment matches.
-        # Safest bet: use a wildcard or 'global.json'.
+        dotnet-version: '10.0.x'
+        dotnet-quality: 'preview'
         
     - name: Restore Dependencies
       run: dotnet restore
