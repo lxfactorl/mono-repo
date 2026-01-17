@@ -1,5 +1,22 @@
 # Tasks
 
+## Phase 0: Telegram Bot Setup (Prerequisites)
+- [ ] Open Telegram and start a chat with [@BotFather](https://t.me/BotFather)
+- [ ] List existing bots: send `/mybots` to BotFather
+- [ ] If you see your old bot → select it → click "API Token" to get the token
+- [ ] If bot is missing or you want a new one → send `/newbot` and follow prompts
+- [ ] Copy the Bot Token (format: `123456789:ABCdefGHIjklMNOpqrSTUvwxYZ`)
+- [ ] Get your Chat ID:
+  - Start a chat with your bot (search for it by username)
+  - Send any message to the bot
+  - Open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` in browser
+  - Find `"chat":{"id":XXXXXXX}` in the response — that's your Chat ID
+- [ ] Test the token works: send a test message via API:
+  ```
+  curl "https://api.telegram.org/bot<TOKEN>/sendMessage?chat_id=<CHAT_ID>&text=Hello"
+  ```
+- [ ] Store credentials securely (do NOT commit to git)
+
 ## Phase 1: Configuration & Secrets Infrastructure
 - [ ] Add `appsettings.Development.json` to monorepo-wide `.gitignore` pattern
 - [ ] Create `TelegramSettings` configuration class with `BotToken` and `ChatId` properties
