@@ -22,7 +22,9 @@ This template encapsulates the "Quality Standard":
 - Build (Strict mode)
 - Format Check
 - Security Scan
-- Test (with coverage)
+- Test Execution (xUnit)
+- Coverage Verification (80% threshold)
+- Coverage Reporting (Summary in PR)
 
 ### 2. The "Trigger" (Caller Workflows)
 Each service will have a tiny, specific workflow file (e.g., `.github/workflows/backend-notification-service.yml`).
