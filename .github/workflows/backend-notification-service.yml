@@ -1,7 +1,8 @@
 name: Notification Service CI
 
 on:
-  pull_request:
+  workflow_call: # Allow being called by the Gate
+  pull_request: # Keep independent trigger for direct feedback loop (optional, but good for dev experience)
     paths:
       - 'src/backend/notification-service/**'
       - 'Directory.Build.props'

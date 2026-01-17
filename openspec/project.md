@@ -60,12 +60,14 @@ Monorepo serving as the root for multiple backend services and client-side appli
   - **E2E Tests**: Black-box validation using `WebApplicationFactory`.
 
 ### Git Workflow
+- **No Auto-Merge**: AI Agents must NEVER merge Pull Requests without explicit user confirmation.
 - Main branch protected, requires PR reviews
 - Feature branches: `feature/<description>`
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Each service deployable independently via Railway
 - **CI/CD Pipeline**:
-  - **Pattern**: Reusable Workflows (`.github/workflows/templates/dotnet-ci.yml`) called by service-specific workflows.
+  - **Monorepo Gate**: A single status check (`Monorepo CI Gate / monorepo-gate`) is required for merging. It orchestrates service-specific checks.
+  - **Pattern**: Reusable Workflows (`.github/workflows/dotnet-ci.yml`) called by service-specific workflows, which are triggered by the gate.
   - **Gates**: Zero Warnings, Formatting (`dotnet format`), Security Audit, 80% Coverage.
   - **Triggers**: Path-based filtering ensures efficient execution per service.
 
