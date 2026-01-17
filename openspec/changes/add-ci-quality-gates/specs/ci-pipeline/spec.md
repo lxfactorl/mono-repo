@@ -54,15 +54,10 @@ The CI pipeline MUST scan all project dependencies for known security vulnerabil
 
 ---
 
-### Requirement: Repository Ruleset Enforcement
-The system MUST use GitHub Repository Rulesets to enforce protection of the `master` branch.
-
-#### Scenario: Unauthorized direct push
-- **WHEN** a user (including administrators) attempts to `git push` directly to `master`
-- **THEN** the push MUST be rejected by GitHub
-- **AND** the user MUST be directed to create a Pull Request
+### Requirement: Strict CI Enforcement
+The system MUST be configured such that all CI status checks pass before a Pull Request can be merged into the `master` branch. This enforcement MUST apply to all users, including administrators.
 
 #### Scenario: Status checks failing on PR
 - **WHEN** one or more CI status checks fail for a PR
-- **THEN** the "Merge" button is disabled for all users, including administrators
+- **THEN** the "Merge" button is disabled
 - **AND** the PR stays in a "Blocked" state until all status checks pass

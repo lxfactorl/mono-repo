@@ -11,10 +11,7 @@ Currently, code quality standards (zero warnings, formatting, coverage) are defi
     - Security Scanning
     - Test Coverage (80%)
 - Create a **Service-Specific Workflow** for the `NotificationService` that triggers only on relevant path changes.
-- Implement **GitHub Repository Rulesets** for the `master` branch to enforce:
-    - Required status checks (Per-service CI)
-    - Restriction of deletions and force pushes
-    - Rejection of direct pushes to `master` (Require PR)
+- Implement **GitHub Repository Rulesets** for the `master` branch to enforce the **Required status checks** (Per-service CI) for all users, including administrators.
 - Add Repository Rulesets guidance to `openspec/project.md`.
 
 ## Impact
