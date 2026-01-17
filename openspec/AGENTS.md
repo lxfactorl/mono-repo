@@ -395,6 +395,13 @@ notifications/spec.md
 - Single-file implementations until proven insufficient
 - Avoid frameworks without clear justification
 - Choose boring, proven patterns
+- **Visibility**: Classes and interfaces MUST be `internal` by default. Use `public` only when strictly required by external consumers.
+
+### Testing Strategy
+- **Default to Integration/Service Tests**: Use `WebApplicationFactory` to spin up the full service.
+- **Dependency Injection**: Resolve services under test from the DI container to ensure real-world configuration and lifecycle.
+- **Mocking**: Substitute external dependencies (ports/adapters) in the `ConfigureTestServices` callback.
+- **Avoid**: Manual instantiation of services with mocked dependencies (pure unit tests) unless testing complex algorithmic logic isolated from the framework.
 
 ### Complexity Triggers
 Only add complexity with:

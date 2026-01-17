@@ -7,7 +7,7 @@ namespace NotificationService.Infrastructure.Providers.Telegram;
 /// Internal port for sending messages to Telegram.
 /// Abstracts the concrete implementation for TDD.
 /// </summary>
-public interface ITelegramMessenger
+internal interface ITelegramMessenger
 {
     Task SendTextMessageAsync(string chatId, string message, CancellationToken cancellationToken);
 }
