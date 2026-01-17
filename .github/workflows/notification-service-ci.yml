@@ -3,10 +3,6 @@ name: Notification Service CI
 on:
   pull_request:
     branches: [ master ]
-    paths:
-      - 'src/backend/notification-service/**'
-      - '.github/workflows/notification-service-ci.yml'
-      - '.github/workflows/templates/template-dotnet-ci.yml'
 
 jobs:
   ci:
