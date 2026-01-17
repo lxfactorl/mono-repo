@@ -23,21 +23,20 @@
 - [ ] Register `TelegramSettings` with validation in DI (fail fast on missing token)
 - [ ] Document secrets setup in README or dedicated SECRETS.md
 
-## Phase 2: Provider Implementation
-- [ ] Create `TelegramProvider` implementing `INotificationProvider`
-- [ ] Use `HttpClient` to call Telegram Bot API (`sendMessage` endpoint)
-- [ ] Format message body using MarkdownV2 parse mode
-- [ ] Handle Telegram API errors: log and throw to trigger HTTP 500
+## Phase 2: TDD - Provider Implementation
+- [ ] Install `Telegram.Bot` NuGet package
+- [ ] Create `TelegramProvider` class skeleton and `TelegramProviderTests` in test project
+- [ ] **RED**: Write failing unit test verifying `SendMessageAsync` is called with correct ChatId and Markdown
+- [ ] **RED**: Write failing unit test verifying `ApiRequestException` is caught and logged/rethrown appropriate to spec
+- [ ] **GREEN**: Implement `TelegramProvider` logic to pass the tests
+- [ ] **REFACTOR**: Review code for clarity and standard formatting helpers
 
-## Phase 3: DI Registration
-- [ ] Register `TelegramProvider` in the provider collection
-- [ ] Ensure provider is conditionally enabled (only when `BotToken` is configured)
+## Phase 3: Wiring & Integration
+- [ ] Register `ITelegramBotClient` in DI (using `HttpClient` factory)
+- [ ] Register `TelegramProvider` in DI (conditionally enabled by config)
+- [ ] Verify application startup with and without secrets
 
-## Phase 4: Testing
-- [ ] Add unit tests for `TelegramProvider` with mocked `HttpClient`
-- [ ] Add integration test scaffold (manual run with real token)
-- [ ] Verify 80% coverage threshold is maintained
-
-## Phase 5: Verification
+## Phase 4: Verification & Process
 - [ ] Local end-to-end test: send notification via API, verify Telegram message received
 - [ ] Document the Telegram Bot setup steps for future reference
+- [ ] **Post-Change**: Update monorepo documentation (e.g., `openspec/AGENTS.md`) to adopt TDD as the standard workflow for logic-heavy features

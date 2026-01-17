@@ -31,8 +31,8 @@ The Notification Service has a `LoggingProvider` for development verification bu
 2. **Dispatcher**: `NotificationDispatcher` iterates registered `INotificationProvider` instances
 3. **TelegramProvider**:
    - Reads `BotToken` and `ChatId` from `TelegramSettings`
-   - Formats message body with MarkdownV2 escaping
-   - POSTs to `https://api.telegram.org/bot{token}/sendMessage`
+   - Uses `ITelegramBotClient.SendMessage()` from **Telegram.Bot** package
+   - Message formatted with MarkdownV2 parse mode (library handles escaping)
 4. **Response Handling**:
    - Success (HTTP 200): Log and continue
    - Failure: Log error, throw exception → triggers HTTP 500 to client
@@ -80,13 +80,23 @@ Pattern added to `.gitignore`:
 
 ## Key Decisions
 
-1. **HttpClient via DI**: Use `IHttpClientFactory` for proper connection pooling and lifecycle management.
+1. **Telegram.Bot NuGet Package**: Use the official community library instead of raw HTTP calls. Benefits:
+   - Type-safe API with `ITelegramBotClient`
+   - Built-in exception types (`ApiRequestException`)
+   - Handles serialization and edge cases
+   - 22M+ downloads, actively maintained
 
-2. **MarkdownV2 Formatting**: Telegram's MarkdownV2 requires escaping special characters (`_`, `*`, `[`, `]`, etc.). Implement a helper method to sanitize message content.
+2. **MarkdownV2 Formatting**: Use library's built-in escaping helpers or `ParseMode.MarkdownV2` enum.
 
 3. **Single Recipient**: Hardcoded `ChatId` for single-owner delivery. Multi-recipient support is out of scope.
 
 4. **Conditional Registration**: Provider is registered only when `BotToken` is configured, allowing graceful fallback to `LoggingProvider` only in unconfigured environments.
+
+## Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|--------|
+| `Telegram.Bot` | Latest stable | Telegram Bot API client |
 
 ## Trade-offs
 
