@@ -1,0 +1,59 @@
+name: .NET Service CI
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        required: true
+        type: string
+        description: "Name of the service (for cache keys and display)"
+      working_directory:
+        required: true
+        type: string
+        description: "Path to the service root (containing .sln or .csproj)"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        dotnet-quality: 'preview'
+        
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Check Formatting
+      run: dotnet format --verify-no-changes --severity warn
+
+    - name: Build (Strict)
+      # /p:TreatWarningsAsErrors=true is set in Directory.Build.props globally, 
+      # but explicit flag here ensures CI "Warning Gate" is robust.
+      run: dotnet build --no-restore /p:TreatWarningsAsErrors=true
+
+    - name: Security Audit
+      run: |
+        dotnet list package --vulnerable --include-transitive > security_audit.txt
+        cat security_audit.txt
+        if grep -q "has the following vulnerable packages" security_audit.txt; then
+          echo "::error::Security vulnerabilities detected!"
+          exit 1
+        fi
+        if grep -q "Top-level Package" security_audit.txt; then
+          echo "::error::Security vulnerabilities detected!"
+          exit 1
+        fi
+
+    - name: Run Tests & Coverage
+      # Relies on Directory.Build.props <Threshold>80</Threshold> to fail the build if coverage is low.
+      run: dotnet test --no-build --verbosity normal
