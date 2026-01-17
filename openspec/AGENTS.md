@@ -12,6 +12,19 @@ Instructions for AI coding assistants using OpenSpec for spec-driven development
 - Validate: `openspec validate [change-id] --strict --no-interactive` and fix issues
 - Request approval: Do not start implementation until proposal is approved
 
+## Git Workflow Rules
+
+> **CRITICAL**: Never push directly to `master`. All changes MUST go through a spec branch and pull request.
+
+- **Branch naming**: `spec/<change-id>` for implementation, `archive/<change-id>` for archiving
+- **Two-PR Workflow** (official OpenSpec methodology):
+  1. **Implementation PR**: `spec/<change-id>` → merge to `master` → verify deployment
+  2. **Archive PR**: `archive/<change-id>` → merge to `master` (happens AFTER deployment is verified)
+- **Enforcement**: OpenSpec workflows gate on branch status:
+  - `openspec-apply`: Creates/switches to spec branch before implementation
+  - `openspec-archive`: Verifies spec branch is merged before archiving, creates archive branch
+  - `openspec-proposal`: Blocks new proposals if active spec exists
+
 ## Three-Stage Workflow
 
 ### Stage 1: Creating Changes
@@ -57,11 +70,13 @@ Track these steps as TODOs and complete them one by one.
 7. **Approval gate** - Do not start implementation until the proposal is reviewed and approved
 
 ### Stage 3: Archiving Changes
-After deployment, create separate PR to:
+**After deployment is verified**, create a **separate PR** from branch `archive/<change-id>` to:
 - Move `changes/[name]/` → `changes/archive/YYYY-MM-DD-[name]/`
 - Update `specs/` if capabilities changed
 - Use `openspec archive <change-id> --skip-specs --yes` for tooling-only changes (always pass the change ID explicitly)
 - Run `openspec validate --strict --no-interactive` to confirm the archived change passes checks
+
+> **Note**: Archiving confirms the change works in production before marking it complete. This is a separate PR from the implementation PR.
 
 ## Before Any Task
 

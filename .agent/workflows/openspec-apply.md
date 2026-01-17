@@ -14,8 +14,10 @@ Track these steps as TODOs and complete them one by one.
 2. Work through tasks sequentially, keeping edits minimal and focused on the requested change.
 3. Confirm completion before updating statuses—make sure every item in `tasks.md` is finished.
 4. Update the checklist after all work is done so each task is marked `- [x]` and reflects reality.
-5. Reference `openspec list` or `openspec show <item>` when additional context is required.
+5. Push the spec branch and create a Pull Request to `master`. Use `/openspec-pr` to generate the PR description.
+6. **Wait for PR merge** — Archiving is a separate step that happens AFTER the PR is merged and deployment is verified.
 
 **Reference**
 - Use `openspec show <id> --json --deltas-only` if you need additional context from the proposal while implementing.
+- After PR is merged: run `/openspec-archive <id>` to complete the change lifecycle.
 <!-- OPENSPEC:END -->
