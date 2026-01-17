@@ -1,6 +1,7 @@
 # Tasks
 
-## Phase 1: Core Logic TDD (Isolated)
+## Phase 1: Core Logic TDD (Isolated) - PR #1
+*Note: Must be merged before starting Phase 2*
 - [ ] Define internal `ITelegramMessenger` interface (Port) for sending messages
 - [ ] Create `TelegramProvider` class depending on `ITelegramMessenger` and `TelegramSettings`
 - [ ] Create `TelegramProviderTests`
@@ -10,7 +11,8 @@
 - [ ] **GREEN**: Implement `TelegramProvider` logic to pass tests (using mocks for Messenger)
 - [ ] **REFACTOR**: Polish provider logic
 
-## Phase 2: Integration & Adapter (The "Real World")
+## Phase 2: Integration & Adapter (The "Real World") - PR #2
+*Note: Must be merged before starting Phase 3*
 - [ ] Install `Telegram.Bot` NuGet package
 - [ ] **Config TDD**: Write tests verifying `TelegramSettings` binds correctly from in-memory config
 - [ ] Create `TelegramSettings` configuration class (`BotToken`, `ChatId`) and register in DI
@@ -20,7 +22,7 @@
 - [ ] Implement `TelegramBotAdapter` : `ITelegramMessenger` using real `TelegramBotClient`
 - [ ] Register `TelegramBotAdapter` as `ITelegramMessenger` in DI
 
-## Phase 3: Configuration & Credentials
+## Phase 3: Configuration & Credentials - PR #3
 - [ ] **Manual**: Get Bot Token from [@BotFather](https://t.me/BotFather) and Chat ID (see reference below)
 - [ ] Add `appsettings.Development.json` to `.gitignore`
 - [ ] Configure `TelegramSettings` with real credentials in `appsettings.Development.json`
