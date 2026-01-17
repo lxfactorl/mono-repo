@@ -1,0 +1,20 @@
+name: Notification Service CI
+
+on:
+  pull_request:
+    paths:
+      - 'src/backend/notification-service/**'
+      - 'Directory.Build.props'
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/backend/notification-service/**'
+      - 'Directory.Build.props'
+
+jobs:
+  ci:
+    uses: ./.github/workflows/templates/dotnet-ci.yml
+    with:
+      service_name: 'NotificationService'
+      working_directory: 'src/backend/notification-service'

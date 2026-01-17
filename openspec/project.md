@@ -64,6 +64,10 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - Feature branches: `feature/<description>`
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Each service deployable independently via Railway
+- **CI/CD Pipeline**:
+  - **Pattern**: Reusable Workflows (`.github/workflows/templates/dotnet-ci.yml`) called by service-specific workflows.
+  - **Gates**: Zero Warnings, Formatting (`dotnet format`), Security Audit, 80% Coverage.
+  - **Triggers**: Path-based filtering ensures efficient execution per service.
 
 ## Domain Context
 This is a multi-service platform. Individual service domains will be documented in their respective `openspec/` directories. Root-level OpenSpec handles:
