@@ -99,4 +99,40 @@ public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program
         await act.Should().ThrowAsync<ArgumentException>()
             .WithMessage("*BotToken*");
     }
+    [Fact]
+    public async Task SendAsync_ShouldLogAndBubble_WhenMessengerFails()
+    {
+        // Arrange
+        var errorFactory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.Configure<TelegramSettings>(settings =>
+                {
+                    settings.BotToken = "valid-token";
+                    settings.ChatId = "valid-chat-id";
+                });
+
+                var failingMessenger = Substitute.For<ITelegramMessenger>();
+                failingMessenger
+                    .When(m => m.SendTextMessageAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.Threading.CancellationToken>()))
+                    .Do(x => throw new System.Net.Http.HttpRequestException("API Error"));
+
+                services.Replace(ServiceDescriptor.Singleton<ITelegramMessenger>(failingMessenger));
+                // Explicitly needed if the main container setup doesn't always add it
+                services.AddScoped<TelegramProvider>();
+            });
+        });
+
+        using var scope = errorFactory.Services.CreateScope();
+        var provider = scope.ServiceProvider.GetRequiredService<TelegramProvider>();
+        var request = new NotificationRequest("recipient", "Hello");
+
+        // Act
+        Func<Task> act = async () => await provider.SendAsync(request);
+
+        // Assert
+        await act.Should().ThrowAsync<System.Net.Http.HttpRequestException>()
+            .WithMessage("API Error");
+    }
 }
