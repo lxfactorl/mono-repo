@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   # 1. PATH FILTERS
-  # Detect which services have changed in this PR/Commit
   filter:
     runs-on: ubuntu-latest
     outputs:
@@ -30,35 +29,76 @@ jobs:
             - '.github/workflows/backend-notification-service.yml'
             - '.github/workflows/dotnet-ci.yml'
 
-  # 2. SERVICE VALIDATION (Conditional)
-  # Calls the reusable workflow for each service triggers by the filter
-  check-notification-service:
-    needs: filter
-    if: ${{ needs.filter.outputs.notification_service == 'true' }}
-    uses: ./.github/workflows/backend-notification-service.yml
-    secrets: inherit # Pass secrets if needed
-
-  # 3. THE MONOREPO GATE (Required Check)
-  # This job ALWAYS runs. It depends on the conditional jobs.
-  # If a conditional job was skipped, this job still succeeds (as long as dependencies didn't fail).
+  # 2. MONOREPO GATE (Single Required Check)
+  # This job runs the validation inline to ensure it's properly tracked by branch protection
   monorepo-gate:
     runs-on: ubuntu-latest
-    needs: [check-notification-service]
-    # Evaluate: If any dependency FAILED, this fail. If Skipped or Success, this Pass.
+    needs: filter
     if: always()
     steps:
-      - name: Verify Gate
+      - name: Checkout
+        if: needs.filter.outputs.notification_service == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        if: needs.filter.outputs.notification_service == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          dotnet-quality: 'preview'
+        
+      - name: Restore Dependencies
+        if: needs.filter.outputs.notification_service == 'true'
+        run: dotnet restore
+        working-directory: src/backend/notification-service
+
+      - name: Check Format
+        if: needs.filter.outputs.notification_service == 'true'
+        run: dotnet format --verify-no-changes --severity warn
+        working-directory: src/backend/notification-service
+
+      - name: Build
+        if: needs.filter.outputs.notification_service == 'true'
+        run: dotnet build --no-restore /p:TreatWarningsAsErrors=true
+        working-directory: src/backend/notification-service
+
+      - name: Security Audit
+        if: needs.filter.outputs.notification_service == 'true'
         run: |
-          # Check status of 'check-notification-service'
-          NS_RESULT="${{ needs.check-notification-service.result }}"
-          
-          echo "Notification Service Result: $NS_RESULT"
-          
-          # Logic: If result is 'failure' or 'cancelled', fail the gate.
-          # 'skipped' or 'success' is acceptable.
-          if [[ "$NS_RESULT" == "failure" || "$NS_RESULT" == "cancelled" ]]; then
-            echo "::error::Notification Service verification failed."
+          OUTPUT=$(dotnet list package --vulnerable --include-transitive 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q "has the following vulnerable packages"; then
+            echo "::error::Vulnerable packages detected"
             exit 1
           fi
+        working-directory: src/backend/notification-service
+
+      - name: Test
+        if: needs.filter.outputs.notification_service == 'true'
+        run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
+        working-directory: src/backend/notification-service
+
+      - name: Verify Coverage
+        if: needs.filter.outputs.notification_service == 'true'
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:./coverage/**/coverage.cobertura.xml -targetdir:./coverage/report -reporttypes:TextSummary
+          cat ./coverage/report/Summary.txt
+          COVERAGE=$(grep "Line coverage:" ./coverage/report/Summary.txt | grep -oP '\d+\.?\d*%' | head -1 | tr -d '%')
+          echo "Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "::error::Coverage $COVERAGE% is below 80% threshold"
+            exit 1
+          fi
+        working-directory: src/backend/notification-service
+
+      - name: Gate Status
+        if: always()
+        run: |
+          if [ "${{ needs.filter.outputs.notification_service }}" != "true" ]; then
+            echo "::notice::No services changed - gate passed (skipped validation)"
+            exit 0
+          fi
           
-          echo "::notice::Monorepo Gate Passed"
+          # If we got here and notification_service was true, all steps passed
+          echo "::notice::Monorepo Gate Passed - All quality checks succeeded"
