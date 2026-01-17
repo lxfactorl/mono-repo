@@ -50,4 +50,9 @@ public class NotificationDispatcherTests
         await act.Should().NotThrowAsync();
         await _provider2.Received(1).SendAsync(request, Arg.Any<CancellationToken>());
     }
+    [Fact]
+    public void Gate_ShouldBlock_WhenTestFails()
+    {
+        Assert.True(false, "This test is intended to fail to verify the CI gate.");
+    }
 }
