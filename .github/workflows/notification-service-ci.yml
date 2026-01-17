@@ -3,15 +3,32 @@ name: Notification Service CI
 on:
   pull_request:
     branches: [ master ]
+  push:
+    branches: [ master ]
     paths:
       - 'src/backend/notification-service/**'
       - '.github/workflows/notification-service-ci.yml'
-      - '.github/workflows/templates/template-dotnet-ci.yml'
+      - '.github/workflows/template-dotnet-ci.yml'
 
 jobs:
-  ci:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      service: ${{ steps.filter.outputs.service }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          service:
+            - 'src/backend/notification-service/**'
+
+  quality-gate:
+    needs: changes
     uses: ./.github/workflows/template-dotnet-ci.yml
     with:
       service_name: 'NotificationService'
       project_path: 'src/backend/notification-service'
       coverage_threshold: 80
+      # If changes detected (true), bypass is false. If no changes (false), bypass is true.
+      bypass_checks: ${{ needs.changes.outputs.service != 'true' }}

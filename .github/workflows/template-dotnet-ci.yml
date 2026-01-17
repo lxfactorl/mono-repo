@@ -13,6 +13,11 @@ on:
         required: false
         type: number
         default: 80
+      bypass_checks:
+        required: false
+        type: boolean
+        default: false
+        description: "If true, skips build/test steps but reports success"
 
 jobs:
   validate:
@@ -22,35 +27,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Bypass Check
+        if: ${{ inputs.bypass_checks }}
+        run: echo "⚠️ Skipping CI checks because 'bypass_checks' is true. Gate satisfied."
+
       - name: Setup .NET
+        if: ${{ !inputs.bypass_checks }}
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: global.json
 
       - name: Restore
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet restore
         working-directory: ${{ inputs.project_path }}
 
       - name: Format Check
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet format --verify-no-changes
         working-directory: ${{ inputs.project_path }}
 
       - name: Security Scan
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet list package --vulnerable --include-transitive
         working-directory: ${{ inputs.project_path }}
 
       - name: Build
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet build --no-restore /p:TreatWarningsAsErrors=true
         working-directory: ${{ inputs.project_path }}
 
       - name: Test
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet test --no-build --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: ${{ inputs.project_path }}
 
       - name: Install ReportGenerator
+        if: ${{ !inputs.bypass_checks }}
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
       - name: Verify Coverage
+        if: ${{ !inputs.bypass_checks }}
         run: |
           reportgenerator -reports:${{ inputs.project_path }}/coverage/**/coverage.cobertura.xml -targetdir:./coveragereport -reporttypes:TextSummary
           COVERAGE=$(grep "Line coverage:" ./coveragereport/Summary.txt | awk '{print $3}' | sed 's/%//')

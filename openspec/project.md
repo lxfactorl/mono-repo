@@ -69,7 +69,7 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Each service deployable independently via Railway
 - **CI/CD Pipeline**:
-  - **Pattern**: **Per-Service CI Workflow** (e.g., `<Service> CI`). Each service has a dedicated workflow with path-based filtering.
+  - **Pattern**: **Per-Service CI Workflow** (e.g., `<Service> CI`). triggers on all PRs to enforce gates, but uses path-based filtering for post-merge pushes.
   - **Enforcement**: **GitHub Repository Rulesets** applied to the `master` branch.
     - **Rule**: Require status checks to pass (e.g., `<Service> CI / validate`).
     - **Rule**: Require a pull request before merging (Restricts direct pushes).
