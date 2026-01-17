@@ -23,7 +23,7 @@ jobs:
           service:
             - 'src/backend/notification-service/**'
 
-  ci:
+  quality-gate:
     needs: changes
     uses: ./.github/workflows/template-dotnet-ci.yml
     with:
