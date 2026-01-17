@@ -16,7 +16,7 @@ Monorepo serving as the root for multiple backend services and client-side appli
 
 ### Infrastructure
 - **Hosting**: Railway (container-based deployment)
-- **Source Control**: GitHub (private repository)
+- **Source Control**: GitHub (public repository)
 - **Monorepo Tooling**: Shared build configuration at root level
 
 ## Project Conventions
@@ -84,7 +84,7 @@ This is a multi-service platform. Individual service domains will be documented 
 - All backend services MUST use the shared code style and linter configuration
 - Each service MUST have its own OpenSpec documentation
 - Services MUST be independently deployable to Railway
-- Private repository - no public exposure of code or secrets
+- **Security**: Public repository - NEVER check in secrets, credentials, or PII. Use environment variables or a secret manager.
 
 ## External Dependencies
 - **Railway**: Platform-as-a-Service for deployment
