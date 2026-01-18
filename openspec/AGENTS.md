@@ -405,10 +405,11 @@ notifications/spec.md
 - **Visibility**: Classes and interfaces MUST be `internal` by default. Use `[InternalsVisibleTo]` in the source project to grant access to the test project.
 
 ### Deployment Standards (Monorepo)
-- **Isolated Docker Builds**: All services MUST use a `Dockerfile` for deployment to ensure consistent SDK versions (e.g., .NET 10) and hermetic builds.
-- **Context Injection**: Since Railway uploads only the service directory, the CI workflow MUST copy shared root files (`Directory.Build.props`, `global.json`) into the service directory before running `railway up`.
-- **Health Checks**: Every service MUST implement a `/health` endpoint and configure `railway.json` with a `healthcheckPath` and a `healthcheckTimeout` (minimum 60s for .NET).
-- **Internal Networking**: Services intended for internal use MUST NOT be exposed to the public internet; use `<service>.railway.internal` for cross-service communication.
+- **Zero-Config Skeleton**: Standard .NET services do NOT need a `Dockerfile`. The shared CI template (`template-dotnet-ci.yml`) automatically provisions one from `.github/templates/dotnet-service.Dockerfile` during the build process if it's missing.
+- **Customization (Override)**: If a service requires custom OS dependencies (e.g., `libgdiplus`), simply create a `Dockerfile` in the service directory. The CI will respect your custom file over the skeleton.
+- **Context Injection**: The CI automatically injects `Directory.Build.props` and `global.json` into the service folder to maintain monorepo-wide compiler and SDK settings.
+- **Internal Networking**: Services intended for internal use MUST NOT be exposed to the public internet; use `<service>.railway.internal`.
+- **Health Checks**: Always configure `railway.json` with a `healthcheckPath` and a `healthcheckTimeout` (minimum 60s).
 
 ### Complexity Triggers
 Only add complexity with:
