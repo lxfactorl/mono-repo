@@ -18,14 +18,14 @@ on:
         type: boolean
         default: false
         description: "If true, skips build/test steps but reports success"
-      railway_service_id:
-        required: false
-        type: string
-        description: "The Railway Service ID to deploy to. If empty, deployment is skipped."
     secrets:
       RAILWAY_TOKEN:
         required: false
         description: "The Railway Project Token."
+      RAILWAY_SERVICE_ID:
+        required: false
+        description: "The Railway Service ID. If empty, deployment is skipped."
+
 
 
 jobs:
@@ -90,7 +90,7 @@ jobs:
   deploy:
     name: deploy
     needs: [validate]
-    if: ${{ inputs.railway_service_id != '' && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}
+    if: ${{ secrets.RAILWAY_SERVICE_ID != '' && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     concurrency:
       group: deploy-${{ inputs.service_name }}
@@ -105,8 +105,9 @@ jobs:
         run: npm i -g @railway/cli
 
       - name: Deploy to Railway
-        run: railway up --service ${{ inputs.railway_service_id }} -d
+        run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} -d
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         working-directory: ${{ inputs.project_path }}
+
 
