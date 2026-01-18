@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace NotificationService.Infrastructure.Providers.Telegram;
 
@@ -28,7 +29,12 @@ internal sealed class TelegramBotAdapter : ITelegramMessenger
         try
         {
             var telegramChatId = ParseChatId(chatId);
-            await _client.SendMessage(telegramChatId, message, cancellationToken: cancellationToken);
+            var escapedMessage = TelegramFormatter.EscapeMarkdownV2(message);
+            await _client.SendMessage(
+                telegramChatId,
+                escapedMessage!,
+                parseMode: ParseMode.MarkdownV2,
+                cancellationToken: cancellationToken);
         }
         catch (ApiRequestException ex)
         {

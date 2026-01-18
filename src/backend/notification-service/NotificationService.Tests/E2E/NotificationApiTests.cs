@@ -19,11 +19,11 @@ public class NotificationApiTests : IClassFixture<WebApplicationFactory<Program>
         {
             builder.ConfigureAppConfiguration((_, config) =>
             {
-                // Explicitly disable Telegram for this test to rely on graceful fallback (LoggerProvider)
-                // This prevents startup crashes due to missing ChatId if BotToken happens to be present in env
+                // Provide dummy valid credentials to satisfy validation, even if we are not testing Telegram here
                 config.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["Telegram:BotToken"] = null
+                    ["Telegram:BotToken"] = "123456:FAKE-TOKEN",
+                    ["Telegram:ChatId"] = "123456789"
                 });
             });
         }).CreateClient();

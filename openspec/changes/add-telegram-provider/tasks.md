@@ -23,14 +23,14 @@
 - [x] Register `TelegramBotAdapter` as `ITelegramMessenger` in DI
 
 ## Phase 3: Configuration & Credentials - PR #3
-- [ ] **Manual**: Get Bot Token from [@BotFather](https://t.me/BotFather) and Chat ID (see reference below)
-- [ ] Add `appsettings.Development.json` to `.gitignore`
-- [ ] Configure `TelegramSettings` with real credentials in `appsettings.Development.json`
-- [ ] Register `TelegramSettings` in DI
+- [x] **Manual**: Get Bot Token from [@BotFather](https://t.me/BotFather) and Chat ID (see reference below)
+- [x] Add `appsettings.Development.json` to `.gitignore`
+- [x] Configure `TelegramSettings` with real credentials in `appsettings.Development.json`
+- [x] Register `TelegramSettings` in DI
 
 ## Phase 4: Verification
-- [ ] Local end-to-end test: send notification via API, verify Telegram message received
-- [ ] **Post-Change**: Update monorepo TDD guidelines in `openspec/AGENTS.md`
+- [x] Local end-to-end test: send notification via API, verify Telegram message received
+- [x] **Post-Change**: Update monorepo TDD guidelines in `openspec/AGENTS.md`
 
 ### Reference: Bot Setup Steps
 1. Chat with [@BotFather](https://t.me/BotFather) -> `/mybots` or `/newbot` -> Get Token

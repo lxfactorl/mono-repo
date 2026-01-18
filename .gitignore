@@ -37,3 +37,6 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Development secrets
+appsettings.Development.json
