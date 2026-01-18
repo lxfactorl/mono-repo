@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace NotificationService.Infrastructure.Providers.Telegram;
+namespace NotificationService.Api.Models.Settings;
 
-internal class TelegramSettings
+internal sealed class TelegramSettings
 {
     [Required]
     public string BotToken { get; set; } = string.Empty;

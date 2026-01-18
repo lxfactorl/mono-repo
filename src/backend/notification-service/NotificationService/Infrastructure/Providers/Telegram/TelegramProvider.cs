@@ -3,12 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NotificationService.Api.Models.Settings;
 using NotificationService.Domain.Interfaces;
 using NotificationService.Domain.Models;
 
 namespace NotificationService.Infrastructure.Providers.Telegram;
 
-internal class TelegramProvider : INotificationProvider
+internal sealed class TelegramProvider : INotificationProvider
 {
     private readonly ITelegramMessenger _messenger;
     private readonly TelegramSettings _settings;

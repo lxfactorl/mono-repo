@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NotificationService.Domain.Interfaces;
 using NotificationService.Domain.Models;
 using NotificationService.Infrastructure.Providers.Telegram;
 using NSubstitute;
@@ -16,37 +18,36 @@ namespace NotificationService.Tests.Integration.Infrastructure.Providers.Telegra
 
 public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    private readonly ITelegramMessenger _mockMessenger;
+    private readonly WebApplicationFactory<Program> _baseFactory;
 
     public TelegramProviderTests(WebApplicationFactory<Program> factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
+        _baseFactory = factory;
+    }
 
-        _mockMessenger = Substitute.For<ITelegramMessenger>();
-        _factory = factory.WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> CreateFactoryWithConfig(
+        Dictionary<string, string?> configOverrides,
+        ITelegramMessenger? mockMessenger = null)
+    {
+        return _baseFactory.WithWebHostBuilder(builder =>
         {
+            // Use in-memory configuration
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddInMemoryCollection(configOverrides);
+            });
+
             builder.ConfigureTestServices(services =>
             {
-                // Register the provider if it's conditional and relies on config?
-                // Actually, if we want to test TelegramProvider specifically, we might need to force register it 
-                // if it's not registered by default when config is missing.
-                // But for now, let's assume valid config injection for the test.
-
-                services.Configure<TelegramSettings>(settings =>
+                // Inject mocked ITelegramMessenger
+                if (mockMessenger != null)
                 {
-                    settings.BotToken = "test-token";
-                    settings.ChatId = "test-chat-id";
-                });
+                    services.RemoveAll<ITelegramMessenger>();
+                    services.AddSingleton(mockMessenger);
+                }
 
-                // Replace the internal messenger with our mock
-                services.RemoveAll<ITelegramMessenger>();
-                services.AddSingleton(_mockMessenger);
-
-                // Ensure TelegramProvider is registered (it might be conditional in Program.cs, 
-                // but we can register it explicitly for the test context if needed, 
-                // or rely on the app's boolean logic if we set settings correctly).
-                // Let's force register it to ensure we are testing the class itself.
+                // Explicitly register TelegramProvider for testing (not in default DI until Phase 2)
                 services.AddScoped<TelegramProvider>();
             });
         });
@@ -56,7 +57,15 @@ public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program
     public async Task SendAsync_ShouldCallMessenger_WhenRequestIsValid()
     {
         // Arrange
-        using var scope = _factory.Services.CreateScope();
+        var mockMessenger = Substitute.For<ITelegramMessenger>();
+        var config = new Dictionary<string, string?>
+        {
+            ["Telegram:BotToken"] = "test-token",
+            ["Telegram:ChatId"] = "test-chat-id"
+        };
+
+        using var factory = CreateFactoryWithConfig(config, mockMessenger);
+        using var scope = factory.Services.CreateScope();
         var provider = scope.ServiceProvider.GetRequiredService<TelegramProvider>();
         var request = new NotificationRequest("recipient", "Hello Integration");
 
@@ -64,31 +73,25 @@ public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program
         await provider.SendAsync(request);
 
         // Assert
-        await _mockMessenger.Received(1).SendTextMessageAsync(
+        await mockMessenger.Received(1).SendTextMessageAsync(
             "test-chat-id",
             "Hello Integration",
-            Arg.Any<System.Threading.CancellationToken>());
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task SendAsync_ShouldThrow_WhenSettingsAreInvalid()
+    public async Task SendAsync_ShouldThrow_WhenBotTokenIsEmpty()
     {
         // Arrange
-        var badConfigFactory = _factory.WithWebHostBuilder(builder =>
+        var mockMessenger = Substitute.For<ITelegramMessenger>();
+        var config = new Dictionary<string, string?>
         {
-            builder.ConfigureTestServices(services =>
-            {
-                services.Configure<TelegramSettings>(settings =>
-                {
-                    settings.BotToken = ""; // Invalid
-                    settings.ChatId = "valid";
-                });
-                services.AddScoped<TelegramProvider>();
-                services.AddSingleton(Substitute.For<ITelegramMessenger>());
-            });
-        });
+            ["Telegram:BotToken"] = "",  // Invalid
+            ["Telegram:ChatId"] = "valid-chat-id"
+        };
 
-        using var scope = badConfigFactory.Services.CreateScope();
+        using var factory = CreateFactoryWithConfig(config, mockMessenger);
+        using var scope = factory.Services.CreateScope();
         var provider = scope.ServiceProvider.GetRequiredService<TelegramProvider>();
         var request = new NotificationRequest("recipient", "Hello");
 
@@ -99,32 +102,20 @@ public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program
         await act.Should().ThrowAsync<ArgumentException>()
             .WithMessage("*BotToken*");
     }
+
     [Fact]
-    public async Task SendAsync_ShouldLogAndBubble_WhenMessengerFails()
+    public async Task SendAsync_ShouldThrow_WhenChatIdIsEmpty()
     {
         // Arrange
-        var errorFactory = _factory.WithWebHostBuilder(builder =>
+        var mockMessenger = Substitute.For<ITelegramMessenger>();
+        var config = new Dictionary<string, string?>
         {
-            builder.ConfigureTestServices(services =>
-            {
-                services.Configure<TelegramSettings>(settings =>
-                {
-                    settings.BotToken = "valid-token";
-                    settings.ChatId = "valid-chat-id";
-                });
+            ["Telegram:BotToken"] = "valid-token",
+            ["Telegram:ChatId"] = ""  // Invalid
+        };
 
-                var failingMessenger = Substitute.For<ITelegramMessenger>();
-                failingMessenger
-                    .When(m => m.SendTextMessageAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<System.Threading.CancellationToken>()))
-                    .Do(x => throw new System.Net.Http.HttpRequestException("API Error"));
-
-                services.Replace(ServiceDescriptor.Singleton<ITelegramMessenger>(failingMessenger));
-                // Explicitly needed if the main container setup doesn't always add it
-                services.AddScoped<TelegramProvider>();
-            });
-        });
-
-        using var scope = errorFactory.Services.CreateScope();
+        using var factory = CreateFactoryWithConfig(config, mockMessenger);
+        using var scope = factory.Services.CreateScope();
         var provider = scope.ServiceProvider.GetRequiredService<TelegramProvider>();
         var request = new NotificationRequest("recipient", "Hello");
 
@@ -132,7 +123,35 @@ public class TelegramProviderTests : IClassFixture<WebApplicationFactory<Program
         Func<Task> act = async () => await provider.SendAsync(request);
 
         // Assert
-        await act.Should().ThrowAsync<System.Net.Http.HttpRequestException>()
+        await act.Should().ThrowAsync<ArgumentException>()
+            .WithMessage("*ChatId*");
+    }
+
+    [Fact]
+    public async Task SendAsync_ShouldLogAndBubbleException_WhenMessengerFails()
+    {
+        // Arrange
+        var failingMessenger = Substitute.For<ITelegramMessenger>();
+        failingMessenger
+            .When(m => m.SendTextMessageAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()))
+            .Do(_ => throw new HttpRequestException("API Error"));
+
+        var config = new Dictionary<string, string?>
+        {
+            ["Telegram:BotToken"] = "valid-token",
+            ["Telegram:ChatId"] = "valid-chat-id"
+        };
+
+        using var factory = CreateFactoryWithConfig(config, failingMessenger);
+        using var scope = factory.Services.CreateScope();
+        var provider = scope.ServiceProvider.GetRequiredService<TelegramProvider>();
+        var request = new NotificationRequest("recipient", "Hello");
+
+        // Act
+        Func<Task> act = async () => await provider.SendAsync(request);
+
+        // Assert
+        await act.Should().ThrowAsync<HttpRequestException>()
             .WithMessage("API Error");
     }
 }
