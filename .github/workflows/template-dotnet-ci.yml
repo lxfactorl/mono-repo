@@ -113,6 +113,12 @@ jobs:
         with:
           fetch-depth: 0 # Needed for automated versioning and tags later
 
+      - name: Prepare Monorepo Context
+        run: |
+          cp -f Directory.Build.props ${{ inputs.project_path }}/ 2>/dev/null || true
+          cp -f global.json ${{ inputs.project_path }}/ 2>/dev/null || true
+
+
       - name: Install Railway CLI
         run: npm i -g @railway/cli
 
