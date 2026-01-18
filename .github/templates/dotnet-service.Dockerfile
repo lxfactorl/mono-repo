@@ -26,4 +26,4 @@ EXPOSE 8080
 
 # Note: Railway sets PORT env var. Shell form required for $PORT expansion.
 # Railway's startCommand in railway.json overrides this, but keeping as fallback.
-CMD dotnet ExecutePlaceholder.dll --urls http://*:${PORT:-8080}
+CMD ["dotnet", "ExecutePlaceholder.dll"]
