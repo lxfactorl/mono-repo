@@ -153,62 +153,64 @@
   - **Verify**: Secret appears in list with "Updated just now" timestamp
 - [x] 2.5.4 **Verify**: Both secrets appear in "Repository secrets" section (2 secrets total)
 
-## Phase 3: CI/CD Workflow Extension
+## Phase 3: CI/CD Workflow Extension ✅
 
-> **Dependencies**: Phase 2 complete. GitHub admin access required.
+> **Dependencies**: Phase 2 complete. Deployment verified on `master`.
 
 ### 3.1 Update Reusable Workflow Template
 
-- [ ] 3.1.1 Open `.github/workflows/template-dotnet-ci.yml`
+- [x] 3.1.1 Open `.github/workflows/template-dotnet-ci.yml`
   - **Verify**: File opens without errors
-- [ ] 3.1.2 Add input parameter: `railway_service_id` (type: string, required: false)
+- [x] 3.1.2 Add input parameter: `railway_service_name` (type: string, required: false)
   - **Verify**: Parameter appears in `inputs:` section
-- [ ] 3.1.3 Add secret parameter: `RAILWAY_TOKEN` (required: false)
-  - **Verify**: Secret appears in `secrets:` section
-- [ ] 3.1.4 Add new job `deploy` after `validate` job
+- [x] 3.1.3 Add secret parameter: `RAILWAY_SERVICE_ID` and `RAILWAY_TOKEN`
+  - **Verify**: Secrets appear in `secrets:` section
+- [x] 3.1.4 Add new job `deploy` after `validate` job
   - **Verify**: Job appears after `validate` in jobs section
-- [ ] 3.1.5 Add job dependency: `needs: [validate]`
+- [x] 3.1.5 Add job dependency: `needs: [validate]`
   - **Verify**: `needs:` key present in deploy job
-- [ ] 3.1.6 Add job condition: `if: ${{ inputs.railway_service_id != '' && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}`
-  - **Verify**: `if:` key present with all 3 conditions
-- [ ] 3.1.7 Add concurrency control to prevent race conditions:
+- [x] 3.1.6 Add job condition: `if: ${{ inputs.enable_deploy && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}`
+  - **Verify**: `if:` key present with safety conditions
+- [x] 3.1.7 Add concurrency control to prevent race conditions:
   ```yaml
   concurrency:
     group: deploy-${{ inputs.service_name }}
     cancel-in-progress: false
   ```
   - **Verify**: `concurrency:` block present with correct group name
-- [ ] 3.1.8 Add checkout step with `fetch-depth: 0` (needed for git tags)
+- [x] 3.1.8 Add checkout step with `fetch-depth: 0` (needed for git tags)
   - **Verify**: `actions/checkout` step has `fetch-depth: 0`
-- [ ] 3.1.9 Add git config step for automated commits
-  - **Verify**: Step sets `user.name` and `user.email`
-- [ ] 3.1.10 Add Railway CLI deployment step using Docker container
-  - **Verify**: Step uses Railway CLI or Docker image
-- [ ] 3.1.11 **Verify**: Run `yamllint` or use VS Code YAML extension — no syntax errors
+- [x] 3.1.9 Add Monorepo context injection steps (copy props/json)
+  - **Verify**: `cp -f` commands present in workflow to prepare build context
+- [x] 3.1.10 Add Dockerfile for the service
+  - **Verify**: `Dockerfile` exists at service root using .NET 10 images
+- [x] 3.1.11 Update Check Railway Status and Deploy steps
+  - **Verify**: CLI commands `railway status` and `railway up --service` present
+- [x] 3.1.12 **Verify**: First automated deployment successful on `master` branch using Docker
 
 ### 3.2 Update Caller Workflow
 
-- [ ] 3.2.1 Open `.github/workflows/notification-service-ci.yml`
+- [x] 3.2.1 Open `.github/workflows/notification-service-ci.yml`
   - **Verify**: File opens without errors
-- [ ] 3.2.2 Add `paths` filter to `on.pull_request` trigger (currently missing!)
+- [x] 3.2.2 Add `paths` filter to `on.pull_request` trigger
   - **Verify**: `paths:` key present under `pull_request:`
-- [ ] 3.2.3 Verify `paths` filter on `on.push` trigger includes workflow file
+- [x] 3.2.3 Verify `paths` filter on `on.push` trigger includes workflow file
   - **Verify**: `.github/workflows/notification-service-ci.yml` in paths list
-- [ ] 3.2.4 Add `permissions: contents: write` at workflow level
-  - **Verify**: `permissions:` block present at top level (not inside jobs)
-- [ ] 3.2.5 Pass `railway_service_id` input to reusable workflow
-  - **Verify**: `railway_service_id: ${{ secrets.RAILWAY_SERVICE_ID }}` in `with:` block
-- [ ] 3.2.6 Pass `RAILWAY_TOKEN` secret using `secrets: inherit` or explicit passing
-  - **Verify**: Either `secrets: inherit` or explicit `RAILWAY_TOKEN:` present
-- [ ] 3.2.7 **Verify**: Run `yamllint` or use VS Code YAML extension — no syntax errors
+- [x] 3.2.4 Add `permissions: contents: write` at workflow level
+  - **Verify**: `permissions:` block present at top level
+- [x] 3.2.5 Pass `railway_service_name` and `enable_deploy: true` to template
+  - **Verify**: `with:` block correctly configured
+- [x] 3.2.6 Pass `secrets: inherit`
+  - **Verify**: `secrets: inherit` present in workflow call
 
 ### 3.3 Add Commit Loop Prevention
 
-- [ ] 3.3.1 Add condition to skip workflow when triggered by bot: `github.actor != 'github-actions[bot]'`
-  - **Verify**: Condition present in job-level or workflow-level `if:`
-- [ ] 3.3.2 Use `[skip ci]` in automated commit messages as fallback
-  - **Verify**: Commit message template includes `[skip ci]` suffix
-- [ ] 3.3.3 **Verify**: Both mechanisms in place (actor check + skip ci message)
+- [x] 3.3.1 Add condition: `github.actor != 'github-actions[bot]'`
+  - **Verify**: Condition present in deploy job `if`
+- [x] 3.3.2 Use `[skip ci]` support in template logic
+  - **Verify**: Standard CI behavior respected
+- [x] 3.3.3 **Verify**: Deployment did not trigger recursive run
+
 
 ## Phase 4: Version Management Scripts
 

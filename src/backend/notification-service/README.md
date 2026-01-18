@@ -18,6 +18,8 @@ This service folder is a self-contained unit:
   - **80% Coverage**: Merges are blocked if line coverage drops below this threshold.
   - **Formatting**: `dotnet format` is enforced.
   - **Security**: Vulnerable package scanning is performed on every PR.
+  - **Dockerized CD**: Deployment to Railway uses a Dockerfile to ensure consistent .NET 10 environments.
+
 
 ### 3. Key Design Patterns
 - **Minimal APIs**: No Controllers; endpoints are registered via extension methods.
@@ -101,9 +103,9 @@ This endpoint is used by Railway to verify the service is running correctly afte
 This service is configured for **Internal Networking** only. It is not exposed to the public internet.
 
 - **Internal Hostname**: `notification-service.railway.internal`
-- **Port**: Bindings respect the `$PORT` environment variable (typically `8080` or `5000` inside Railway).
+- **Port**: Bindings respect the `$PORT` environment variable (typically `8080` or `5000` inside Railway). The service container is configured to listen on all interfaces.
+- **Deployment Strategy**: This service uses an **Isolated Docker Build**. Before deployment, shared monorepo files (`Directory.Build.props`, `global.json`) are injected into the service directory to ensure a hermetic build.
 
-Other services within the same Railway project can reach this service using the internal hostname.
 
 
 ## Versioning
