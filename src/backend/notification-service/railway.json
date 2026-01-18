@@ -1,0 +1,8 @@
+{
+    "$schema": "https://railway.com/railway.schema.json",
+    "deploy": {
+        "startCommand": "dotnet NotificationService.dll --urls http://*:$PORT",
+        "healthcheckPath": "/health",
+        "healthcheckTimeout": 30
+    }
+}

@@ -84,74 +84,74 @@
 
 > **Purpose**: Railway CLI enables local development with production secrets and production debugging.
 
-- [ ] 2.0.1 Install Railway CLI: `npm i -g @railway/cli` (or `scoop install railway` on Windows)
-- [ ] 2.0.2 **Verify**: Run `railway --version` — should show version number
-- [ ] 2.0.3 Login to Railway: `railway login`
-- [ ] 2.0.4 **Verify**: Run `railway whoami` — should show your account
-- [ ] 2.0.5 (After project creation) Link to project: `railway link` from repo root
-- [ ] 2.0.6 (After project creation) Link to service: `railway service` → select notification-service
-- [ ] 2.0.7 **Verify**: Run `railway status` — should show linked project and service
+- [x] 2.0.1 Install Railway CLI: `npm i -g @railway/cli` (or `scoop install railway` on Windows)
+- [x] 2.0.2 **Verify**: Run `railway --version` — shows `railway 4.25.2`
+- [x] 2.0.3 Login to Railway: `railway login`
+- [x] 2.0.4 **Verify**: Run `railway whoami` — shows `fiodorov@gmail.com`
+- [x] 2.0.5 (After project creation) Link to project: `railway link` from repo root (Linked to `mono-repo`)
+- [x] 2.0.6 (After project creation) Link to service: Linked manually or via `railway service` (Linked to `notification-service`)
+- [x] 2.0.7 **Verify**: Run `railway status` — shows linked project `mono-repo` and service `notification-service`
 
 ### 2.1 Create Railway Project Structure
 
-- [ ] 2.1.1 Log in to Railway dashboard: https://railway.app/dashboard
+- [x] 2.1.1 Log in to Railway dashboard: https://railway.app/dashboard
   - **Verify**: Dashboard loads without errors
-- [ ] 2.1.2 Create new project (or use existing): name it `mono-repo` or similar
+- [x] 2.1.2 Create new project (or use existing): name it `mono-repo` or similar
   - **Verify**: Project appears in dashboard project list
-- [ ] 2.1.3 Create service within project: name it `notification-service`
-  - **Verify**: Service card visible in project canvas
-- [ ] 2.1.4 **IMPORTANT**: Do NOT create a public domain for notification-service (internal only)
-- [ ] 2.1.5 **Verify**: Service Settings → Networking → No public domain assigned
-- [ ] 2.1.6 Note internal hostname: `notification-service.railway.internal` (for future services)
-  - **Verify**: Hostname documented in this task or service README
+- [x] 2.1.3 Create service within project: name it `notification-service`
+  - **Verify**: Created via CLI: `railway add --service notification-service`
+- [x] 2.1.4 **IMPORTANT**: Do NOT create a public domain for notification-service (internal only)
+- [x] 2.1.5 **Verify**: Service Settings → Networking → No public domain assigned
+- [x] 2.1.6 Note internal hostname: `notification-service.railway.internal` (for future services)
+  - **Verify**: Hostname documented in service README
 
 ### 2.2 Configure Railway Secrets
 
-- [ ] 2.2.1 Navigate to Railway dashboard → notification-service → Variables
+- [x] 2.2.1 Navigate to Railway dashboard → notification-service → Variables
   - **Verify**: Variables tab is accessible
-- [ ] 2.2.2 Add `Telegram__BotToken` with value from Telegram BotFather
+- [x] 2.2.2 Add `Telegram__BotToken` with value from Telegram BotFather
   - **Verify**: Variable appears in list after saving
-- [ ] 2.2.3 Mark `Telegram__BotToken` as "sealed" if available
+- [x] 2.2.3 Mark `Telegram__BotToken` as "sealed" if available
   - **Verify**: Variable shows "sealed" indicator (if feature exists)
-- [ ] 2.2.4 Add `Telegram__ChatId` with chat ID value
+- [x] 2.2.4 Add `Telegram__ChatId` with chat ID value
   - **Verify**: Variable appears in list after saving
-- [ ] 2.2.5 **Verify**: Both variables visible in Railway dashboard (2 variables total)
+- [x] 2.2.5 **Verify**: Both variables visible in Railway dashboard (2 variables total)
 
 ### 2.3 Get Railway Credentials
 
-- [ ] 2.3.1 Navigate to Railway dashboard → Project Settings → Tokens
+- [x] 2.3.1 Navigate to Railway dashboard → Project Settings → Tokens
   - **Verify**: Tokens section is accessible
-- [ ] 2.3.2 Create new project token (NOT account token)
+- [x] 2.3.2 Create new project token (NOT account token)
   - **Verify**: New token appears in list with creation date
-- [ ] 2.3.3 Copy token value (will be used as `RAILWAY_TOKEN`)
-  - **Verify**: Token copied to clipboard or password manager
-- [ ] 2.3.4 Navigate to Service → Settings → copy Service ID
-  - **Verify**: Service ID is a UUID format (e.g., `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
-- [ ] 2.3.5 **Verify**: Both token and service ID saved securely (password manager or secure notes)
+- [x] 2.3.3 Copy token value (will be used as `RAILWAY_TOKEN`)
+  - **Verify**: Token copied to clipboard
+- [x] 2.3.4 Navigate to Service → Settings → copy Service ID
+  - **Verify**: Service ID is `a57669d4-913d-418b-9602-0ee828e3f976`
+- [x] 2.3.5 **Verify**: Both token and service ID saved securely
 
 ### 2.4 Create Railway Configuration File
 
-- [ ] 2.4.1 Create file: `src/backend/notification-service/railway.json`
+- [x] 2.4.1 Create file: `src/backend/notification-service/railway.json`
   - **Verify**: File exists at correct path
-- [ ] 2.4.2 Add JSON schema reference: `"$schema": "https://railway.com/railway.schema.json"`
+- [x] 2.4.2 Add JSON schema reference: `"$schema": "https://railway.com/railway.schema.json"`
   - **Verify**: VS Code shows schema validation (IntelliSense works)
-- [ ] 2.4.3 Add `deploy.startCommand`: `"dotnet NotificationService.dll --urls http://*:$PORT"`
+- [x] 2.4.3 Add `deploy.startCommand`: `"dotnet NotificationService.dll --urls http://*:$PORT"`
   - **Verify**: No schema validation errors on this field
-- [ ] 2.4.4 Add `deploy.healthcheckPath`: `"/health"`
+- [x] 2.4.4 Add `deploy.healthcheckPath`: `"/health"`
   - **Verify**: Path matches endpoint added in 1.1
-- [ ] 2.4.5 Add `deploy.healthcheckTimeout`: `30`
+- [x] 2.4.5 Add `deploy.healthcheckTimeout`: `30`
   - **Verify**: Value is number, not string
-- [ ] 2.4.6 **Verify**: JSON syntax is valid — no red squiggles in VS Code
+- [x] 2.4.6 **Verify**: JSON syntax is valid — file created successfully
 
 ### 2.5 Configure GitHub Secrets
 
-- [ ] 2.5.1 Navigate to GitHub repository → Settings → Secrets and variables → Actions
+- [x] 2.5.1 Navigate to GitHub repository → Settings → Secrets and variables → Actions
   - **Verify**: Actions secrets page is accessible
-- [ ] 2.5.2 Add new repository secret: `RAILWAY_TOKEN` with token from step 2.3.3
+- [x] 2.5.2 Add new repository secret: `RAILWAY_TOKEN` with token from step 2.3.3
   - **Verify**: Secret appears in list with "Updated just now" timestamp
-- [ ] 2.5.3 Add new repository secret: `RAILWAY_SERVICE_ID` with ID from step 2.3.4
+- [x] 2.5.3 Add new repository secret: `RAILWAY_SERVICE_ID` with ID from step 2.3.4
   - **Verify**: Secret appears in list with "Updated just now" timestamp
-- [ ] 2.5.4 **Verify**: Both secrets appear in "Repository secrets" section (2 secrets total)
+- [x] 2.5.4 **Verify**: Both secrets appear in "Repository secrets" section (2 secrets total)
 
 ## Phase 3: CI/CD Workflow Extension
 
