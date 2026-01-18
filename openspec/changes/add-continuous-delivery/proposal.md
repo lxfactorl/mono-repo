@@ -26,6 +26,7 @@ Currently, the project has CI (Continuous Integration) pipelines that validate c
 - Add Railway project configuration files (`railway.json` with JSON schema) for each service, following Railway best practices
 - **Single project, multiple services**: One Railway project containing all backend services
 - Ensure deployments only occur after successful CI validation passes
+- **Robust Verification**: Implement wait-and-verify logic to poll deployment status after trigger, ensuring only successful deployments are tagged
 
 ### Versioning & Release
 - **Automatic versioning**: Automatically increment version numbers based on semantic commit types (feat: = minor, fix: = patch, BREAKING = major)

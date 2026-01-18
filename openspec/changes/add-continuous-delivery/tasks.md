@@ -209,7 +209,14 @@
   - **Verify**: Condition present in deploy job `if`
 - [x] 3.3.2 Use `[skip ci]` support in template logic
   - **Verify**: Standard CI behavior respected
-- [x] 3.3.3 **Verify**: Deployment did not trigger recursive run
+### 3.4 Implement Wait-and-Verify Logic
+- [x] 3.4.1 Modify `deploy` job to capture deployment ID from `railway up --json`
+  - **Verify**: Step outputs deployment ID
+- [x] 3.4.2 Implement polling loop to check deployment status
+  - **Verify**: Loop continues while status is `BUILDING` or `DEPLOYING`
+- [x] 3.4.3 Fail job if deployment status becomes `FAILED` or `CRASHED`
+  - **Verify**: CI job fails on bad deployment
+- [x] 3.4.4 **Verify**: Successful deployment passes wait check and CI job succeeds
 
 
 ## Phase 4: Version Management Scripts
