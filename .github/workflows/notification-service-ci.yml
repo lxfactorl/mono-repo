@@ -3,12 +3,20 @@ name: Notification Service CI
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - 'src/backend/notification-service/**'
+      - '.github/workflows/notification-service-ci.yml'
+      - '.github/workflows/template-dotnet-ci.yml'
   push:
     branches: [ master ]
     paths:
       - 'src/backend/notification-service/**'
       - '.github/workflows/notification-service-ci.yml'
       - '.github/workflows/template-dotnet-ci.yml'
+
+permissions:
+  contents: write
+
 
 jobs:
   changes:
@@ -33,3 +41,6 @@ jobs:
       coverage_threshold: 80
       # If changes detected (true), bypass is false. If no changes (false), bypass is true.
       bypass_checks: ${{ needs.changes.outputs.service != 'true' }}
+      railway_service_id: ${{ secrets.RAILWAY_SERVICE_ID }}
+    secrets: inherit
+
