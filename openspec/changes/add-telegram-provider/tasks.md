@@ -13,14 +13,14 @@
 
 ## Phase 2: Integration & Adapter (The "Real World") - PR #2
 *Note: Must be merged before starting Phase 3*
-- [ ] Install `Telegram.Bot` NuGet package
-- [ ] **Config TDD**: Write tests verifying `TelegramSettings` binds correctly from in-memory config
-- [ ] Create `TelegramSettings` configuration class (`BotToken`, `ChatId`) and register in DI
-- [ ] **Adapter TDD**: Write tests for `TelegramBotAdapter` mocking `ITelegramBotClient`
-  - Verify `SendMessageAsync` is called with correct parameters
-  - Verify `ApiRequestException` fro NuGet is caught and rethrown as domain exception
-- [ ] Implement `TelegramBotAdapter` : `ITelegramMessenger` using real `TelegramBotClient`
-- [ ] Register `TelegramBotAdapter` as `ITelegramMessenger` in DI
+- [x] Install `Telegram.Bot` NuGet package
+- [x] **Config TDD**: Write tests verifying `TelegramSettings` binds correctly from in-memory config
+- [x] Create `TelegramSettings` configuration class (`BotToken`, `ChatId`) and register in DI
+- [x] **Adapter TDD**: Write tests for `TelegramBotAdapter` mocking `ITelegramBotClient`
+- [x]   Verify `SendMessageAsync` is called with correct parameters
+- [x]   Verify `ApiRequestException` from NuGet is caught and rethrown as domain exception
+- [x] Implement `TelegramBotAdapter` : `ITelegramMessenger` using real `TelegramBotClient`
+- [x] Register `TelegramBotAdapter` as `ITelegramMessenger` in DI
 
 ## Phase 3: Configuration & Credentials - PR #3
 - [ ] **Manual**: Get Bot Token from [@BotFather](https://t.me/BotFather) and Chat ID (see reference below)
