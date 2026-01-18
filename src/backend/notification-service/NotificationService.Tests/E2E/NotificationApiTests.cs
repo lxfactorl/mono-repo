@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using NotificationService.Api.Models.Requests;
 using Xunit;
 
@@ -14,7 +15,18 @@ public class NotificationApiTests : IClassFixture<WebApplicationFactory<Program>
     public NotificationApiTests(WebApplicationFactory<Program> factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
-        _client = factory.CreateClient();
+        _client = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                // Explicitly disable Telegram for this test to rely on graceful fallback (LoggerProvider)
+                // This prevents startup crashes due to missing ChatId if BotToken happens to be present in env
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Telegram:BotToken"] = null
+                });
+            });
+        }).CreateClient();
     }
 
     [Fact]

@@ -4,9 +4,9 @@ namespace NotificationService.Api.Models.Settings;
 
 internal sealed class TelegramSettings
 {
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string BotToken { get; set; } = string.Empty;
 
-    [Required]
+    [Required(AllowEmptyStrings = false)]
     public string ChatId { get; set; } = string.Empty;
 }

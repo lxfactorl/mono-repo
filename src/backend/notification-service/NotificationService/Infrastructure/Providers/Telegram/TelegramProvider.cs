@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+
 using NotificationService.Api.Models.Settings;
 using NotificationService.Domain.Interfaces;
 using NotificationService.Domain.Models;
@@ -17,11 +17,11 @@ internal sealed class TelegramProvider : INotificationProvider
 
     public TelegramProvider(
         ITelegramMessenger messenger,
-        IOptions<TelegramSettings> settings,
+        TelegramSettings settings,
         ILogger<TelegramProvider> logger)
     {
         _messenger = messenger;
-        _settings = settings.Value;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -29,12 +29,6 @@ internal sealed class TelegramProvider : INotificationProvider
 
     public async Task SendAsync(NotificationRequest request, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_settings.BotToken))
-            throw new ArgumentException("BotToken cannot be empty");
-
-        if (string.IsNullOrWhiteSpace(_settings.ChatId))
-            throw new ArgumentException("ChatId cannot be empty");
-
         try
         {
             await _messenger.SendTextMessageAsync(_settings.ChatId, request.Message, cancellationToken);

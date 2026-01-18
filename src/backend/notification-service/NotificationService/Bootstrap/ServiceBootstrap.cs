@@ -28,12 +28,16 @@ public static class ServiceBootstrap
         builder.Services
             .AddValidatedOptions<AppNotificationSettings>(builder.Configuration, "NotificationSettings")
             .AddApplication()
-            .AddInfrastructure();
+            .AddInfrastructure(builder.Configuration);
 
-        // Telegram settings registered without startup validation (runtime validation in TelegramProvider)
-        // Phase 2 will add ValidateOnStart after real adapter integration
-        builder.Services.AddOptions<TelegramSettings>()
-            .Bind(builder.Configuration.GetSection("Telegram"));
+
+        // Telegram settings registration (conditional)
+        // Only enabled if BotToken is present to allow graceful fallback
+        var telegramSection = builder.Configuration.GetSection("Telegram");
+        if (!string.IsNullOrWhiteSpace(telegramSection.GetValue<string>("BotToken")))
+        {
+            builder.Services.AddValidatedOptions<TelegramSettings>(builder.Configuration, "Telegram");
+        }
 
         return builder;
     }
