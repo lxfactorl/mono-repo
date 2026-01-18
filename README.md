@@ -56,6 +56,9 @@ dotnet build
 
 # Run tests
 dotnet test
+
+# Run local CI (mirrors GitHub CI exactly)
+./ci.ps1 -ServicePath "src/backend/notification-service" -CoverageThreshold 80
 ```
 
 ## Development Workflow
