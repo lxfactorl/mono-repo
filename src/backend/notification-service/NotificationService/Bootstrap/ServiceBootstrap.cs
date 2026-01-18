@@ -53,7 +53,13 @@ public static class ServiceBootstrap
             app.MapScalarApiReference();
         }
 
-        // 2. Endpoints
+        // 2. Health Check (Railway deployment verification)
+        app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
+            .WithName("HealthCheck")
+            .WithTags("Infrastructure")
+            .WithDescription("Health check endpoint for deployment verification");
+
+        // 3. Endpoints
         app.MapNotificationEndpoints();
 
         return app;

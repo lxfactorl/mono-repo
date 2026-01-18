@@ -80,3 +80,82 @@ To run the specific CI validation locally:
 # From the monorepo root
 dotnet test src/backend/notification-service --collect:"XPlat Code Coverage"
 ```
+
+## Health Check Endpoint
+
+The service exposes a health check endpoint for deployment verification:
+
+```bash
+GET /health
+```
+
+**Response** (200 OK):
+```json
+{"status": "healthy"}
+```
+
+This endpoint is used by Railway to verify the service is running correctly after deployment.
+
+## Versioning
+
+This service uses **Semantic Versioning** (SemVer). The current version is defined in `NotificationService.csproj`:
+
+```xml
+<Version>1.0.0</Version>
+```
+
+Version bumps are automated by the CD pipeline based on commit message prefixes:
+- `feat:` → Minor version bump (1.0.0 → 1.1.0)
+- `fix:` → Patch version bump (1.0.0 → 1.0.1)
+- `BREAKING CHANGE:` → Major version bump (1.0.0 → 2.0.0)
+
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
+
+## Structured Logging (Railway Observability)
+
+The service uses **Serilog** with JSON formatting for Railway's Log Explorer:
+
+```json
+{
+  "Timestamp": "2026-01-18T12:00:00.000Z",
+  "Level": "Information",
+  "Message": "Notification sent successfully",
+  "Properties": {
+    "Provider": "Telegram",
+    "Recipient": "user123"
+  }
+}
+```
+
+### Log Filtering in Railway
+
+Search logs using Railway's query syntax:
+- Filter by level: `@level:error`
+- Filter by provider: `@Properties.Provider:telegram`
+- Combine filters: `@level:error AND "notification"`
+
+### Configuration
+
+Logging is configured in `appsettings.json`:
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft.AspNetCore": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "formatter": "Serilog.Formatting.Json.JsonFormatter, Serilog"
+        }
+      }
+    ],
+    "Enrich": ["FromLogContext", "WithMachineName", "WithThreadId"]
+  }
+}
+```
+
