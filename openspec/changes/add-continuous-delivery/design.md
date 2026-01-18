@@ -265,7 +265,8 @@ jobs:
 - Use `--detach --json` flags to trigger deployment and capture deployment ID
 - **Wait-and-Verify via GraphQL API**: Poll Railway's GraphQL API for deployment status
   - Endpoint: `https://backboard.railway.com/graphql/v2`
-  - Authentication: `Project-Access-Token: $RAILWAY_TOKEN` header (required for project tokens)
+  - Authentication: `Project-Access-Token: $RAILWAY_TOKEN` header
+    - **Note**: This differs from the `Authorization: Bearer <token>` header used for Personal/Team tokens. Project Tokens (scoped to a project) MUST use `Project-Access-Token`.
   - Query deployment status using deployment ID from `railway up --json` output
   - Poll every 5 seconds, timeout after 5 minutes (60 attempts)
   - Success states: `SUCCESS`, `ACTIVE` (Railway only sets these after health checks pass)
@@ -288,6 +289,26 @@ jobs:
 - Never hardcode tokens in workflow files
 - Use Docker container approach (`ghcr.io/railwayapp/cli:latest`) for consistent CLI version
 - Reference: [GitHub Docs: Using secrets in GitHub Actions](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+
+**Dockerfile Template Technical Details** (`.github/templates/dotnet-service.Dockerfile`):
+- Multi-stage build: SDK image for build, ASP.NET runtime image for deployment
+- Uses `mcr.microsoft.com/dotnet/aspnet:10.0` runtime image for minimal size
+- CI workflow provisions Dockerfile from template if service doesn't have one
+- Placeholders (`ExecutePlaceholder.dll`, `${PROJECT_PATH}`) replaced during CI provisioning
+
+**Critical: CMD Shell Form for PORT Expansion**:
+```dockerfile
+# WRONG - exec form doesn't expand $PORT
+ENTRYPOINT ["dotnet", "app.dll", "--urls", "http://*:$PORT"]  
+
+# CORRECT - shell form expands $PORT at runtime
+CMD dotnet app.dll --urls http://*:${PORT:-8080}
+```
+- Railway sets `PORT` environment variable for each deployment
+- Exec form (JSON array) passes literal string `$PORT` instead of the port number
+- Shell form is required for environment variable expansion
+- `${PORT:-8080}` provides fallback default if PORT is unset
+- Railway's `startCommand` in `railway.json` overrides this, but Dockerfile CMD is the fallback
 
 **Alternative Considered**: Railway GitHub integration (automatic deploys)
 - **Rejected**: Less control over deployment timing and version tracking
