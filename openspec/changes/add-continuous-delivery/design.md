@@ -262,9 +262,25 @@ jobs:
 - Use Railway project token (`RAILWAY_TOKEN`) stored as GitHub secret (not account token)
 - CLI can be installed via npm (`@railway/cli`) or Docker image (`ghcr.io/railwayapp/cli:latest`)
 - For monorepo, each service must specify `--service=<service_id>` flag
-- Use `--detach` flag to start deployment, then POLL for status
-- **Wait-and-Verify**: Script loops checking `railway status` until success or failure
-- Only tag if deployment succeeds
+- Use `--detach --json` flags to trigger deployment and capture deployment ID
+- **Wait-and-Verify via GraphQL API**: Poll Railway's GraphQL API for deployment status
+  - Endpoint: `https://backboard.railway.com/graphql/v2`
+  - Authentication: `Authorization: Bearer $RAILWAY_TOKEN` header
+  - Query deployment status using deployment ID from `railway up --json` output
+  - Poll every 5 seconds, timeout after 5 minutes (60 attempts)
+  - Success states: `SUCCESS`, `ACTIVE` (Railway only sets these after health checks pass)
+  - Failure states: `FAILED`, `CRASHED`, `REMOVED`
+  - In-progress states: `BUILDING`, `DEPLOYING`, `INITIALIZING`
+- Only create git tag if deployment reaches `SUCCESS` or `ACTIVE` status
+- Fallback: If deployment ID extraction fails, query latest deployment for the service
+
+**Why GraphQL API over Log Parsing**:
+- **Reliable**: Uses official Railway API, not fragile log pattern matching
+- **Accurate**: Checks actual deployment status, not log output
+- **Health-aware**: Railway only marks as SUCCESS after configured health checks pass
+- **Industry standard**: Polling deployment status via API is the standard pattern
+- **Maintainable**: Won't break if log formats change
+- **Future-proof**: Railway's GraphQL API is a stable, versioned interface
 
 **GitHub Actions Integration**:
 - Store `RAILWAY_TOKEN` as repository secret (Settings → Secrets and variables → Actions)
@@ -629,6 +645,52 @@ git commit -m "chore($SERVICE): release v$VERSION [skip ci]"
 
 **Alternative Considered**: Version bump in PR branch before merge
 - **Rejected**: Complicates workflow; version should reflect merged state, not PR state
+
+### Decision 20: Deployment Verification Method
+**Decision**: Use Railway's GraphQL API to poll deployment status instead of log parsing or webhook-based approaches.
+
+**Rationale**:
+- **Reliability**: Railway's GraphQL API provides authoritative deployment status, not inferred from logs
+- **Health Check Integration**: Railway only marks deployments as `SUCCESS` after configured health checks pass
+- **Industry Standard**: Polling deployment status via API is the standard CI/CD pattern
+- **Simplicity**: No need to expose webhook endpoints or manage GitHub deployment events
+- **Accuracy**: Eliminates false positives/negatives from log pattern matching
+- **Maintainability**: Railway's GraphQL API is versioned and stable, unlike log formats
+
+**Implementation**:
+```bash
+# Query deployment status via GraphQL API
+curl -X POST https://backboard.railway.com/graphql/v2 \
+  -H "Authorization: Bearer $RAILWAY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "query { deployment(id: \"<deployment_id>\") { status } }"}'
+```
+
+**Alternatives Considered**:
+
+1. **Log Parsing** (initial implementation)
+   - **Rejected**: Fragile, unreliable, framework-dependent
+   - Success indicators vary ("listening on", "application started", "now listening")
+   - Logs may be buffered, delayed, or contain false positives
+   - No guarantee service is actually healthy, just that it logged something
+   - Not industry standard
+
+2. **Railway Webhooks + GitHub deployment_status events**
+   - **Rejected**: Requires exposing public webhook endpoint
+   - Adds complexity for managing webhook receivers
+   - Overkill for simple deployment verification
+   - Better suited for multi-system integrations
+
+3. **Railway CLI `status --json` parsing**
+   - **Rejected**: Complex JSON structure, difficult to parse reliably
+   - Doesn't provide deployment-specific status, only service-level status
+   - Less accurate than querying specific deployment object
+
+**Trade-offs**:
+- **Polling overhead**: Makes API calls every 5 seconds during deployment (acceptable for Railway's rate limits)
+- **Requires GraphQL knowledge**: Team must understand basic GraphQL queries (minimal learning curve)
+- **API dependency**: Relies on Railway's GraphQL API availability (acceptable, same as CLI dependency)
+
 
 ### Decision 16: First Release Handling
 **Decision**: When no previous git tag exists for a service, the version bump script will:

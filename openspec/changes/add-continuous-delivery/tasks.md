@@ -210,13 +210,18 @@
 - [x] 3.3.2 Use `[skip ci]` support in template logic
   - **Verify**: Standard CI behavior respected
 ### 3.4 Implement Wait-and-Verify Logic
-- [ ] 3.4.1 Modify `deploy` job to capture deployment ID from `railway up --json`
-  - **Verify**: Step outputs deployment ID
-- [ ] 3.4.2 Implement polling loop to check deployment status
-  - **Verify**: Loop continues while status is `BUILDING` or `DEPLOYING`
-- [ ] 3.4.3 Fail job if deployment status becomes `FAILED` or `CRASHED`
-  - **Verify**: CI job fails on bad deployment
-- [ ] 3.4.4 **Verify**: Successful deployment passes wait check and CI job succeeds
+- [ ] 3.4.1 Modify `deploy` job to capture deployment ID from `railway up --detach --json`
+  - **Verify**: Step outputs deployment ID (with fallback to querying latest deployment)
+- [ ] 3.4.2 Implement polling loop to check deployment status via Railway GraphQL API
+  - **Verify**: Loop polls `https://backboard.railway.com/graphql/v2` for deployment status
+  - **Verify**: Uses `Authorization: Bearer $RAILWAY_TOKEN` header for authentication
+  - **Verify**: Queries deployment object by ID: `query { deployment(id: "<id>") { status } }`
+- [ ] 3.4.3 Fail job if deployment status becomes `FAILED`, `CRASHED`, or `REMOVED`
+  - **Verify**: CI job fails on terminal failure states
+  - **Verify**: Deployment logs are fetched and displayed on failure
+- [ ] 3.4.4 **Verify**: Successful deployment passes wait check when status is `SUCCESS` or `ACTIVE`
+  - **Verify**: Deployment succeeds only after Railway's health checks pass (Railway sets SUCCESS/ACTIVE after health check)
+  - **Verify**: Git tag is only created after successful deployment verification
 
 
 ## Phase 4: Version Management Scripts
