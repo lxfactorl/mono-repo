@@ -18,6 +18,21 @@ on:
         type: boolean
         default: false
         description: "If true, skips build/test steps but reports success"
+      enable_deploy:
+        required: false
+        type: boolean
+        default: false
+        description: "If true, enables the deployment job."
+    secrets:
+
+      RAILWAY_TOKEN:
+        required: false
+        description: "The Railway Project Token."
+      RAILWAY_SERVICE_ID:
+        required: false
+        description: "The Railway Service ID. If empty, deployment is skipped."
+
+
 
 jobs:
   validate:
@@ -77,3 +92,29 @@ jobs:
             exit 1
           fi
           echo "✅ Coverage $COVERAGE% meets threshold"
+
+  deploy:
+    name: deploy
+    needs: [validate]
+    if: ${{ inputs.enable_deploy && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: deploy-${{ inputs.service_name }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for automated versioning and tags later
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy to Railway
+        run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} -d
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        working-directory: ${{ inputs.project_path }}
+
+
