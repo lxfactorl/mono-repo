@@ -147,7 +147,78 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy to Railway
-        run: railway up --service ${{ inputs.railway_service_name }} -d
+        run: |
+          # 1. Trigger the deployment and capture JSON output
+          echo "🚀 Triggering deployment..."
+          DEPLOY_OUTPUT=$(railway up --service ${{ inputs.railway_service_name }} -d --json)
+          echo "$DEPLOY_OUTPUT"
+          
+          # 2. Extract Deployment ID
+          DEPLOYMENT_ID=$(echo "$DEPLOY_OUTPUT" | jq -r '.id')
+          if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" == "null" ]; then
+            echo "❌ Failed to capture Deployment ID."
+            exit 1
+          fi
+          echo "🆔 Deployment ID: $DEPLOYMENT_ID"
+
+          # 3. Wait loop (Verify Phase)
+          MAX_ATTEMPTS=60 # 5 minutes + buffer
+          ATTEMPT=1
+          
+          echo "⏳ Waiting for deployment to stabilize..."
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            sleep 5
+            
+            # Fetch status of this specific deployment
+            # Note: CLI doesn't easily fetch status by ID without list, so we check service status
+            # For strictness, usually we'd want to query the specific deployment ID, 
+            # but 'railway status' gives active deployment info.
+            
+            # More robust: check logs/status via CLI
+            STATUS_JSON=$(railway status --json)
+            # We assume active environment from token
+            
+            # Parse the service status
+            # Complex JSON parsing might be needed if multiple services exist, 
+            # but we are in a monorepo context where we link specific service or check broadly.
+            
+            # Simpler approach: 'railway up --detach' returns immediately.
+            # We can use 'railway logs --deployment' to see if it crashed immediately?
+            # Or inspect 'railway status'
+            
+            # Let's use a simpler heuristic for this script:
+            # We will assume if 'railway status' shows active status as 'SUCCESS' for our service, we are good.
+            
+            # Actually, `railway up` output has the ID. 
+            # Let's just wait a fixed period for "Health Check" if configured?
+            # No, user wants explicit check.
+            
+            # Re-evaluating: 'railway status' output contains the service status.
+            LATEST_STATUS=$(echo "$STATUS_JSON" | jq -r ".services.edges[] | select(.node.name == \"${{ inputs.railway_service_name }}\") | .node.status" 2>/dev/null)
+            
+            # Fallback for simple single-service projects
+            if [ -z "$LATEST_STATUS" ]; then
+               LATEST_STATUS=$(echo "$STATUS_JSON" | jq -r ".status") 
+            fi
+
+            echo "Attempt $ATTEMPT: Status is '$LATEST_STATUS'"
+
+            if [ "$LATEST_STATUS" == "SUCCESS" ]; then
+              echo "✅ Deployment Successful!"
+              exit 0
+            elif [ "$LATEST_STATUS" == "FAILED" ] || [ "$LATEST_STATUS" == "CRASHED" ]; then
+              echo "❌ Deployment Failed with status: $LATEST_STATUS"
+              echo "📖 Fetching last 50 lines of logs..."
+              railway logs --deployment --lines 50
+              exit 1
+            fi
+            
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+          echo "❌ Timeout waiting for deployment verification."
+          exit 1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         working-directory: ${{ inputs.project_path }}

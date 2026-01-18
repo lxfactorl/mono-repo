@@ -262,7 +262,9 @@ jobs:
 - Use Railway project token (`RAILWAY_TOKEN`) stored as GitHub secret (not account token)
 - CLI can be installed via npm (`@railway/cli`) or Docker image (`ghcr.io/railwayapp/cli:latest`)
 - For monorepo, each service must specify `--service=<service_id>` flag
-- Use `--detach` flag if real-time logs are not needed
+- Use `--detach` flag to start deployment, then POLL for status
+- **Wait-and-Verify**: Script loops checking `railway status` until success or failure
+- Only tag if deployment succeeds
 
 **GitHub Actions Integration**:
 - Store `RAILWAY_TOKEN` as repository secret (Settings → Secrets and variables → Actions)

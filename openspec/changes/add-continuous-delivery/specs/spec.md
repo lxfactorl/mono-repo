@@ -320,6 +320,16 @@ The deployment workflow SHALL prevent concurrent deployments of the same service
 - **THEN** the concurrency group SHALL be named `deploy-<service-name>`
 - **AND** each service SHALL have its own independent concurrency group
 
+### Requirement: Robust Deployment Verification
+The deployment process SHALL explicitly wait for and verify successful deployment before considering the job complete.
+
+#### Scenario: Verify Deployment Status
+- **WHEN** a deployment is triggered via `railway up`
+- **THEN** the workflow SHALL poll the deployment status
+- **AND** it SHALL wait until status is `SUCCESS` or `FAILED`
+- **AND** if status is `FAILED` or `CRASHED`, the CI job SHALL fail
+- **AND** the git tag SHALL NOT be created for failed deployments
+
 ### Requirement: Automated Commit Loop Prevention
 The deployment workflow SHALL prevent infinite loops caused by automated version commits.
 
