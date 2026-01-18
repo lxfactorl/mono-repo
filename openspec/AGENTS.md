@@ -398,10 +398,11 @@ notifications/spec.md
 - **Visibility**: Classes and interfaces MUST be `internal` by default. Use `public` only when strictly required by external consumers.
 
 ### Testing Strategy
-- **Default to Integration/Service Tests**: Use `WebApplicationFactory` to spin up the full service.
-- **Dependency Injection**: Resolve services under test from the DI container to ensure real-world configuration and lifecycle.
-- **Mocking**: Substitute external dependencies (ports/adapters) in the `ConfigureTestServices` callback.
-- **Avoid**: Manual instantiation of services with mocked dependencies (pure unit tests) unless testing complex algorithmic logic isolated from the framework.
+- **Balanced Pyramid**: Use a mix of unit, integration, and E2E tests based on the component's role.
+- **Internal Logic (Unit Tests)**: Prefer pure unit tests (manual instantiation) for internal service logic (e.g., Providers). They are faster, more isolated, and avoid DI resolution complexities.
+- **Infrastructure (Integration Tests)**: Use `WebApplicationFactory` for Adapters and E2E API flows to verify real IO, routing, and configuration binding.
+- **Mocking**: Use NSubstitute to substitute external dependencies (ports/adapters).
+- **Visibility**: Classes and interfaces MUST be `internal` by default. Use `[InternalsVisibleTo]` in the source project to grant access to the test project.
 
 ### Complexity Triggers
 Only add complexity with:

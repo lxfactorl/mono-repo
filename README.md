@@ -61,6 +61,15 @@ dotnet test
 ./ci.ps1 -ServicePath "src/backend/notification-service" -CoverageThreshold 80
 ```
 
+## API Documentation
+
+When running locally in `Development` mode, services provide interactive API documentation:
+
+- **Scalar (UI)**: [http://localhost:<port>/scalar/v1](http://localhost:5272/scalar/v1)
+- **OpenAPI Spec**: [http://localhost:<port>/openapi/v1.json](http://localhost:5272/openapi/v1.json)
+
+The `notification-service` is configured to automatically open the Scalar UI when debugging or running via `dotnet run`.
+
 ## Development Workflow
 
 ### Branching
