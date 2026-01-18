@@ -296,19 +296,16 @@ jobs:
 - CI workflow provisions Dockerfile from template if service doesn't have one
 - Placeholders (`ExecutePlaceholder.dll`, `${PROJECT_PATH}`) replaced during CI provisioning
 
-**Critical: CMD Shell Form for PORT Expansion**:
-```dockerfile
-# WRONG - exec form doesn't expand $PORT
-ENTRYPOINT ["dotnet", "app.dll", "--urls", "http://*:$PORT"]  
+**Zero-Config Port Binding Strategy**:
+- .NET 8/9/10 defaults to port 8080.
+- Railway also defaults to port 8080 for health checks.
+- By **omitting** the explicit `--urls` flag in `railway.json` and the `Dockerfile`, the framework and platform automatically negotiate the correct port.
+- This avoids shell expansion issues (literal `$PORT` strings) and manual configuration overhead.
 
-# CORRECT - shell form expands $PORT at runtime
-CMD dotnet app.dll --urls http://*:${PORT:-8080}
-```
-- Railway sets `PORT` environment variable for each deployment
-- Exec form (JSON array) passes literal string `$PORT` instead of the port number
-- Shell form is required for environment variable expansion
-- `${PORT:-8080}` provides fallback default if PORT is unset
-- Railway's `startCommand` in `railway.json` overrides this, but Dockerfile CMD is the fallback
+**Legacy Knowledge: CMD Shell Form for Variable Expansion**:
+- If environment variables MUST be expanded in a Docker command, use **shell form** (`CMD command $VAR`) or a wrapper script. 
+- **Exec form** (JSON array `CMD ["cmd", "$VAR"]`) does NOT expand variables and passes them as literal strings.
+- This was initially the root cause of health check failures when using `--urls http://*:$PORT`.
 
 **Alternative Considered**: Railway GitHub integration (automatic deploys)
 - **Rejected**: Less control over deployment timing and version tracking
@@ -688,16 +685,39 @@ curl -X POST https://backboard.railway.com/graphql/v2 \
 ```
 
 **Alternatives Considered**:
-
 1. **Log Parsing** (initial implementation)
    - **Rejected**: Fragile, unreliable, framework-dependent
    - Success indicators vary ("listening on", "application started", "now listening")
-   - Logs may be buffered, delayed, or contain false positives
-   - No guarantee service is actually healthy, just that it logged something
-   - Not industry standard
-
 2. **Railway Webhooks + GitHub deployment_status events**
    - **Rejected**: Requires exposing public webhook endpoint
+
+### Decision 21: Logging Strategy for Railway
+**Decision**: Use `Serilog.Formatting.Compact.RenderedCompactJsonFormatter` for console output.
+
+**Rationale**:
+- **Readability**: The compact rendered version includes the fully formatted message (e.g., "Now listening on http://[::]:8080") as a field called `@m`.
+- **Railway Compatibility**: Railway displays raw JSON fields. Providing a rendered message ensures logs are human-readable without sacrificing structured data.
+
+**Implementation**:
+- Add `Serilog.Formatting.Compact` package.
+- Configure in `appsettings.json`:
+```json
+"formatter": "Serilog.Formatting.Compact.RenderedCompactJsonFormatter, Serilog.Formatting.Compact"
+```
+
+### Decision 22: Port Binding Strategy for Modern .NET and Railway
+**Decision**: Use a "Zero-Config" port binding strategy by omitting explicit `--urls` flags or environment variable expansion in deployment manifests.
+
+**Rationale**:
+- **The Issue**: Early attempts to use `--urls http://*:$PORT` failed because Railway's `startCommand` (and many container runtimes) does not perform shell variable expansion by default. This resulted in Kestrel attempting to bind to the literal string `$PORT`.
+- **The Fix**: Modern .NET (8+) defaults to port 8080. Railway also defaults to port 8080. Removing the explicit flag allows the framework and host to sync up automatically.
+- **Robustness**: Eliminates the need for shell expansion hacks (`sh -c ...`) or fragile Dockerfile configuration.
+- **Consistency**: Works across local Docker development and production Railway environments without modification.
+
+**Implementation**:
+- **`railway.json`**: `"startCommand": "dotnet Service.dll"` (No `--urls` flag)
+- **`Dockerfile`**: `CMD ["dotnet", "Service.dll"]` (No shell form, no `--urls` flag)
+- Both default to 8080.
    - Adds complexity for managing webhook receivers
    - Overkill for simple deployment verification
    - Better suited for multi-system integrations
