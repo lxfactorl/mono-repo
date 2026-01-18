@@ -96,6 +96,16 @@ GET /health
 
 This endpoint is used by Railway to verify the service is running correctly after deployment.
 
+## Internal Networking
+
+This service is configured for **Internal Networking** only. It is not exposed to the public internet.
+
+- **Internal Hostname**: `notification-service.railway.internal`
+- **Port**: Bindings respect the `$PORT` environment variable (typically `8080` or `5000` inside Railway).
+
+Other services within the same Railway project can reach this service using the internal hostname.
+
+
 ## Versioning
 
 This service uses **Semantic Versioning** (SemVer). The current version is defined in `NotificationService.csproj`:

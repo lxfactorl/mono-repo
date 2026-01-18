@@ -100,22 +100,22 @@
   - **Verify**: Project appears in dashboard project list
 - [x] 2.1.3 Create service within project: name it `notification-service`
   - **Verify**: Created via CLI: `railway add --service notification-service`
-- [ ] 2.1.4 **IMPORTANT**: Do NOT create a public domain for notification-service (internal only)
-- [ ] 2.1.5 **Verify**: Service Settings → Networking → No public domain assigned
-- [ ] 2.1.6 Note internal hostname: `notification-service.railway.internal` (for future services)
-  - **Verify**: Hostname documented in this task or service README
+- [x] 2.1.4 **IMPORTANT**: Do NOT create a public domain for notification-service (internal only)
+- [x] 2.1.5 **Verify**: Service Settings → Networking → No public domain assigned
+- [x] 2.1.6 Note internal hostname: `notification-service.railway.internal` (for future services)
+  - **Verify**: Hostname documented in service README
 
 ### 2.2 Configure Railway Secrets
 
-- [ ] 2.2.1 Navigate to Railway dashboard → notification-service → Variables
+- [x] 2.2.1 Navigate to Railway dashboard → notification-service → Variables
   - **Verify**: Variables tab is accessible
-- [ ] 2.2.2 Add `Telegram__BotToken` with value from Telegram BotFather
+- [x] 2.2.2 Add `Telegram__BotToken` with value from Telegram BotFather
   - **Verify**: Variable appears in list after saving
-- [ ] 2.2.3 Mark `Telegram__BotToken` as "sealed" if available
+- [x] 2.2.3 Mark `Telegram__BotToken` as "sealed" if available
   - **Verify**: Variable shows "sealed" indicator (if feature exists)
-- [ ] 2.2.4 Add `Telegram__ChatId` with chat ID value
+- [x] 2.2.4 Add `Telegram__ChatId` with chat ID value
   - **Verify**: Variable appears in list after saving
-- [ ] 2.2.5 **Verify**: Both variables visible in Railway dashboard (2 variables total)
+- [x] 2.2.5 **Verify**: Both variables visible in Railway dashboard (2 variables total)
 
 ### 2.3 Get Railway Credentials
 
