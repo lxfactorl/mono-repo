@@ -32,7 +32,7 @@ internal sealed class TelegramBotAdapter : ITelegramMessenger
             var escapedMessage = TelegramFormatter.EscapeMarkdownV2(message);
             await _client.SendMessage(
                 telegramChatId,
-                escapedMessage,
+                escapedMessage!,
                 parseMode: ParseMode.MarkdownV2,
                 cancellationToken: cancellationToken);
         }

@@ -9,7 +9,7 @@ internal static class TelegramFormatter
     /// Note: This is a basic implementation. It avoids escaping characters commonly used for 
     /// deliberate formatting in this project (*, _, |, `, [, ], (, )).
     /// </summary>
-    public static string EscapeMarkdownV2(string text)
+    public static string? EscapeMarkdownV2(string? text)
     {
         if (string.IsNullOrEmpty(text)) return text;
 

@@ -17,6 +17,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Xunit;
 
 namespace NotificationService.Tests.Integration.Infrastructure.Providers.Telegram;
@@ -93,8 +94,12 @@ public class TelegramBotAdapterTests : IClassFixture<WebApplicationFactory<Progr
 
         // Assert
         // Verify that SendRequest was called with a SendMessageRequest containing correct data
+        // Note: '!' is escaped by our TelegramFormatter
         await mockClient.Received(1).SendRequest(
-            Arg.Is<SendMessageRequest>(r => r.ChatId.Identifier == 12345 && r.Text == "Hello Telegram!"),
+            Arg.Is<SendMessageRequest>(r =>
+                r.ChatId.Identifier == 12345 &&
+                r.Text == "Hello Telegram\\!" &&
+                r.ParseMode == ParseMode.MarkdownV2),
             Arg.Any<CancellationToken>());
     }
 
@@ -149,7 +154,10 @@ public class TelegramBotAdapterTests : IClassFixture<WebApplicationFactory<Progr
 
         // Assert
         await mockClient.Received(1).SendRequest(
-            Arg.Is<SendMessageRequest>(r => r.ChatId.Username == "@mychannel" && r.Text == "Channel message"),
+            Arg.Is<SendMessageRequest>(r =>
+                r.ChatId.Username == "@mychannel" &&
+                r.Text == "Channel message" &&
+                r.ParseMode == ParseMode.MarkdownV2),
             Arg.Any<CancellationToken>());
     }
 }
