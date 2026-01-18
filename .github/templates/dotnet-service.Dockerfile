@@ -24,6 +24,6 @@ COPY --from=build /app .
 ENV PORT=8080
 EXPOSE 8080
 
-# Note: Entrypoint is set by Railway via startCommand in railway.json 
-# or we can use a generic launcher. For consistency with our current setup:
-ENTRYPOINT ["dotnet", "ExecutePlaceholder.dll", "--urls", "http://*:$PORT"]
+# Note: Railway sets PORT env var. Shell form required for $PORT expansion.
+# Railway's startCommand in railway.json overrides this, but keeping as fallback.
+CMD dotnet ExecutePlaceholder.dll --urls http://*:${PORT:-8080}
