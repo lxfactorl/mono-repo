@@ -146,78 +146,107 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Deploy to Railway
+      - name: Deploy to Railway and Verify
         run: |
-          # 1. Trigger the deployment and capture JSON output
+          set -e  # Exit on error
+          
+          # 1. Trigger deployment and capture JSON output
           echo "🚀 Triggering deployment..."
-          DEPLOY_OUTPUT=$(railway up --service ${{ inputs.railway_service_name }} -d --json)
+          DEPLOY_OUTPUT=$(railway up --service ${{ inputs.railway_service_name }} -d --json 2>&1)
+          echo "📋 Deploy command output:"
           echo "$DEPLOY_OUTPUT"
           
           # 2. Extract Deployment ID
-          DEPLOYMENT_ID=$(echo "$DEPLOY_OUTPUT" | jq -r '.id')
+          DEPLOYMENT_ID=$(echo "$DEPLOY_OUTPUT" | jq -r '.deploymentId // .id // empty' 2>/dev/null || echo "")
+          
           if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" == "null" ]; then
-            echo "❌ Failed to capture Deployment ID."
-            exit 1
+            echo "⚠️  Could not extract deployment ID from railway up output."
+            echo "🔍 Attempting to fetch latest deployment for service..."
+            
+            # Fallback: Query latest deployment via GraphQL API
+            LATEST_DEPLOY_QUERY='{"query": "query { service(id: \"'${{ secrets.RAILWAY_SERVICE_ID }}'\") { latestDeployment { id status } } }"}'
+            LATEST_DEPLOY_RESPONSE=$(curl -s -X POST https://backboard.railway.com/graphql/v2 \
+              -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "$LATEST_DEPLOY_QUERY")
+            
+            DEPLOYMENT_ID=$(echo "$LATEST_DEPLOY_RESPONSE" | jq -r '.data.service.latestDeployment.id // empty')
+            
+            if [ -z "$DEPLOYMENT_ID" ] || [ "$DEPLOYMENT_ID" == "null" ]; then
+              echo "❌ Failed to obtain deployment ID via GraphQL fallback."
+              echo "📋 GraphQL response: $LATEST_DEPLOY_RESPONSE"
+              exit 1
+            fi
+            
+            echo "✅ Retrieved deployment ID via GraphQL: $DEPLOYMENT_ID"
+          else
+            echo "✅ Deployment ID: $DEPLOYMENT_ID"
           fi
-          echo "🆔 Deployment ID: $DEPLOYMENT_ID"
 
-          # 3. Wait loop (Verify Phase)
-          MAX_ATTEMPTS=60 # 5 minutes + buffer
+          # 3. Poll Railway GraphQL API for deployment status
+          MAX_ATTEMPTS=60  # 5 minutes (60 * 5s = 300s)
           ATTEMPT=1
           
-          echo "⏳ Waiting for deployment to stabilize..."
+          echo ""
+          echo "⏳ Waiting for deployment to complete..."
+          echo "   Polling Railway GraphQL API for status updates..."
+          echo ""
           
           while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
             sleep 5
             
-            # Fetch status of this specific deployment
-            # Note: CLI doesn't easily fetch status by ID without list, so we check service status
-            # For strictness, usually we'd want to query the specific deployment ID, 
-            # but 'railway status' gives active deployment info.
+            # Query deployment status via GraphQL API
+            GRAPHQL_QUERY='{"query": "query { deployment(id: \"'$DEPLOYMENT_ID'\") { id status } }"}'
+            GRAPHQL_RESPONSE=$(curl -s -X POST https://backboard.railway.com/graphql/v2 \
+              -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d "$GRAPHQL_QUERY")
             
-            # More robust: check logs/status via CLI
-            STATUS_JSON=$(railway status --json)
-            # We assume active environment from token
+            # Extract status from GraphQL response
+            DEPLOYMENT_STATUS=$(echo "$GRAPHQL_RESPONSE" | jq -r '.data.deployment.status // empty')
             
-            # Parse the service status
-            # Complex JSON parsing might be needed if multiple services exist, 
-            # but we are in a monorepo context where we link specific service or check broadly.
-            
-            # Simpler approach: 'railway up --detach' returns immediately.
-            # We can use 'railway logs --deployment' to see if it crashed immediately?
-            # Or inspect 'railway status'
-            
-            # Let's use a simpler heuristic for this script:
-            # We will assume if 'railway status' shows active status as 'SUCCESS' for our service, we are good.
-            
-            # Actually, `railway up` output has the ID. 
-            # Let's just wait a fixed period for "Health Check" if configured?
-            # No, user wants explicit check.
-            
-            # Re-evaluating: 'railway status' output contains the service status.
-            LATEST_STATUS=$(echo "$STATUS_JSON" | jq -r ".services.edges[] | select(.node.name == \"${{ inputs.railway_service_name }}\") | .node.status" 2>/dev/null)
-            
-            # Fallback for simple single-service projects
-            if [ -z "$LATEST_STATUS" ]; then
-               LATEST_STATUS=$(echo "$STATUS_JSON" | jq -r ".status") 
+            if [ -z "$DEPLOYMENT_STATUS" ]; then
+              echo "⚠️  Attempt $ATTEMPT: Could not parse deployment status from GraphQL response"
+              echo "📋 Response: $GRAPHQL_RESPONSE"
+              ATTEMPT=$((ATTEMPT + 1))
+              continue
             fi
-
-            echo "Attempt $ATTEMPT: Status is '$LATEST_STATUS'"
-
-            if [ "$LATEST_STATUS" == "SUCCESS" ]; then
-              echo "✅ Deployment Successful!"
-              exit 0
-            elif [ "$LATEST_STATUS" == "FAILED" ] || [ "$LATEST_STATUS" == "CRASHED" ]; then
-              echo "❌ Deployment Failed with status: $LATEST_STATUS"
-              echo "📖 Fetching last 50 lines of logs..."
-              railway logs --deployment --lines 50
-              exit 1
-            fi
+            
+            echo "📊 Attempt $ATTEMPT/$MAX_ATTEMPTS: Deployment status = $DEPLOYMENT_STATUS"
+            
+            # Check for terminal states
+            case "$DEPLOYMENT_STATUS" in
+              SUCCESS|ACTIVE)
+                echo ""
+                echo "✅ Deployment successful!"
+                echo "   Railway has verified health checks passed."
+                echo "   Status: $DEPLOYMENT_STATUS"
+                exit 0
+                ;;
+              FAILED|CRASHED|REMOVED)
+                echo ""
+                echo "❌ Deployment failed with status: $DEPLOYMENT_STATUS"
+                echo "📖 Fetching deployment logs for debugging..."
+                railway logs --service ${{ inputs.railway_service_name }} --lines 50 || true
+                exit 1
+                ;;
+              BUILDING|DEPLOYING|INITIALIZING|QUEUED)
+                # In-progress states - continue waiting
+                ;;
+              *)
+                echo "⚠️  Unknown deployment status: $DEPLOYMENT_STATUS"
+                ;;
+            esac
             
             ATTEMPT=$((ATTEMPT + 1))
           done
           
-          echo "❌ Timeout waiting for deployment verification."
+          # Timeout reached
+          echo ""
+          echo "❌ Timeout waiting for deployment verification (5 minutes elapsed)."
+          echo "   Last known status: $DEPLOYMENT_STATUS"
+          echo "📖 Final deployment logs:"
+          railway logs --service ${{ inputs.railway_service_name }} --lines 50 || true
           exit 1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
