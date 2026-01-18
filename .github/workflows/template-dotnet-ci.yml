@@ -18,7 +18,13 @@ on:
         type: boolean
         default: false
         description: "If true, skips build/test steps but reports success"
+      enable_deploy:
+        required: false
+        type: boolean
+        default: false
+        description: "If true, enables the deployment job."
     secrets:
+
       RAILWAY_TOKEN:
         required: false
         description: "The Railway Project Token."
@@ -90,8 +96,9 @@ jobs:
   deploy:
     name: deploy
     needs: [validate]
-    if: ${{ secrets.RAILWAY_SERVICE_ID != '' && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}
+    if: ${{ inputs.enable_deploy && github.ref == 'refs/heads/master' && github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
+
     concurrency:
       group: deploy-${{ inputs.service_name }}
       cancel-in-progress: false
