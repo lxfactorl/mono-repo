@@ -21,6 +21,10 @@ public static class LayerRegistration
         ArgumentNullException.ThrowIfNull(services);
 
         services.AddScoped<INotificationProvider, LoggingProvider>();
+
+        // TelegramProvider will be registered in Phase 2 when ITelegramMessenger adapter is implemented
+        // For now, tests register it explicitly with mocked dependencies
+
         return services;
     }
 }

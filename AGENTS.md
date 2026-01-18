@@ -17,6 +17,22 @@ Use `@/openspec/AGENTS.md` to learn:
 
 > **CRITICAL**: Never push directly to `master`. All changes must go through a spec branch (`spec/<change-id>`) and pull request.
 
+## Local CI (Mandatory)
+
+> **RULE**: Before creating or updating a PR, you MUST run the local CI script to get fast feedback. This mirrors GitHub CI exactly.
+
+```powershell
+./ci.ps1 -ServicePath "src/backend/<service-name>" -CoverageThreshold 80
+```
+
+The local CI validates:
+- Format check (`dotnet format --verify-no-changes`)
+- Security scan (vulnerable packages)
+- Build with zero warnings
+- Tests with coverage threshold
+
+**Do NOT push until local CI passes.** This ensures short feedback loops and avoids waiting for GitHub CI.
+
 Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->

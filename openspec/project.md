@@ -68,6 +68,11 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - Feature branches: `feature/<description>`
 - Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
 - Each service deployable independently via Railway
+- **Local CI (Mandatory)**:
+  - **Script**: `./ci.ps1 -ServicePath "src/backend/<service-name>" -CoverageThreshold 80`
+  - **Rule**: MUST run local CI before creating or updating a PR.
+  - **Purpose**: Provides instant feedback loop identical to GitHub CI.
+  - **Gates**: Format check, security scan, build (zero warnings), tests, coverage threshold.
 - **CI/CD Pipeline**:
   - **Pattern**: **Per-Service CI Workflow** (e.g., `<Service> CI`). triggers on all PRs to enforce gates, but uses path-based filtering for post-merge pushes.
   - **Enforcement**: **GitHub Repository Rulesets** applied to the `master` branch.

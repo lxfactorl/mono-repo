@@ -30,6 +30,11 @@ public static class ServiceBootstrap
             .AddApplication()
             .AddInfrastructure();
 
+        // Telegram settings registered without startup validation (runtime validation in TelegramProvider)
+        // Phase 2 will add ValidateOnStart after real adapter integration
+        builder.Services.AddOptions<TelegramSettings>()
+            .Bind(builder.Configuration.GetSection("Telegram"));
+
         return builder;
     }
 

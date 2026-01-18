@@ -56,6 +56,9 @@ dotnet build
 
 # Run tests
 dotnet test
+
+# Run local CI (mirrors GitHub CI exactly)
+./ci.ps1 -ServicePath "src/backend/notification-service" -CoverageThreshold 80
 ```
 
 ## Development Workflow
@@ -76,6 +79,20 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 - EditorConfig enforces consistent formatting
 - Roslyn analyzers run as errors in CI
 - Minimum 80% test coverage
+
+### Local CI (Mandatory)
+
+> ⚠️ **Before creating or updating a PR, you MUST run the local CI script.**
+
+```powershell
+./ci.ps1 -ServicePath "src/backend/<service-name>" -CoverageThreshold 80
+```
+
+This mirrors GitHub CI exactly and provides instant feedback:
+- Format check (`dotnet format --verify-no-changes`)
+- Security scan (vulnerable packages)
+- Build with zero warnings
+- Tests with 80% coverage threshold
 
 ## Documentation
 
