@@ -222,6 +222,9 @@
 - [x] 3.4.4 **Verify**: Successful deployment passes wait check when status is `SUCCESS` or `ACTIVE`
   - **Verify**: Deployment succeeds only after Railway's health checks pass (Railway sets SUCCESS/ACTIVE after health check)
   - **Verify**: Git tag is only created after successful deployment verification
+- [x] 3.4.5 Stabilize Dockerfile template for Kestrel and Railway
+  - **Verify**: Dockerfile uses `CMD` shell form for proper `$PORT` environment variable expansion
+  - **Verify**: Health endpoint `/health` is reachable and returns 200 OK after deployment
 
 
 ## Phase 4: Version Management Scripts
