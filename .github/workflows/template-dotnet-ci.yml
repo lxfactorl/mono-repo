@@ -23,7 +23,12 @@ on:
         type: boolean
         default: false
         description: "If true, enables the deployment job."
+      railway_service_name:
+        required: false
+        type: string
+        description: "The name of the service in Railway (e.g., notification-service)."
     secrets:
+
 
       RAILWAY_TOKEN:
         required: false
@@ -111,10 +116,16 @@ jobs:
       - name: Install Railway CLI
         run: npm i -g @railway/cli
 
+      - name: Check Railway Status
+        run: railway status
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
       - name: Deploy to Railway
-        run: railway up --service ${{ secrets.RAILWAY_SERVICE_ID }} -d
+        run: railway up --service ${{ inputs.railway_service_name }} -d
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         working-directory: ${{ inputs.project_path }}
+
 
 
