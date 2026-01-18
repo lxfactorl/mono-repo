@@ -265,7 +265,7 @@ jobs:
 - Use `--detach --json` flags to trigger deployment and capture deployment ID
 - **Wait-and-Verify via GraphQL API**: Poll Railway's GraphQL API for deployment status
   - Endpoint: `https://backboard.railway.com/graphql/v2`
-  - Authentication: `Authorization: Bearer $RAILWAY_TOKEN` header
+  - Authentication: `Project-Access-Token: $RAILWAY_TOKEN` header (required for project tokens)
   - Query deployment status using deployment ID from `railway up --json` output
   - Poll every 5 seconds, timeout after 5 minutes (60 attempts)
   - Success states: `SUCCESS`, `ACTIVE` (Railway only sets these after health checks pass)
@@ -661,7 +661,7 @@ git commit -m "chore($SERVICE): release v$VERSION [skip ci]"
 ```bash
 # Query deployment status via GraphQL API
 curl -X POST https://backboard.railway.com/graphql/v2 \
-  -H "Authorization: Bearer $RAILWAY_TOKEN" \
+  -H "Project-Access-Token: $RAILWAY_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"query": "query { deployment(id: \"<deployment_id>\") { status } }"}'
 ```

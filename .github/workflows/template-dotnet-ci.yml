@@ -166,7 +166,7 @@ jobs:
             # Fallback: Query latest deployment via GraphQL API
             LATEST_DEPLOY_QUERY='{"query": "query { service(id: \"'${{ secrets.RAILWAY_SERVICE_ID }}'\") { latestDeployment { id status } } }"}'
             LATEST_DEPLOY_RESPONSE=$(curl -s -X POST https://backboard.railway.com/graphql/v2 \
-              -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+              -H "Project-Access-Token: ${{ secrets.RAILWAY_TOKEN }}" \
               -H "Content-Type: application/json" \
               -d "$LATEST_DEPLOY_QUERY")
             
@@ -198,7 +198,7 @@ jobs:
             # Query deployment status via GraphQL API
             GRAPHQL_QUERY='{"query": "query { deployment(id: \"'$DEPLOYMENT_ID'\") { id status } }"}'
             GRAPHQL_RESPONSE=$(curl -s -X POST https://backboard.railway.com/graphql/v2 \
-              -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+              -H "Project-Access-Token: ${{ secrets.RAILWAY_TOKEN }}" \
               -H "Content-Type: application/json" \
               -d "$GRAPHQL_QUERY")
             

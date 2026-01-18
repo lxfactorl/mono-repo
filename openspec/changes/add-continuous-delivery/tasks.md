@@ -214,7 +214,7 @@
   - **Verify**: Step outputs deployment ID (with fallback to querying latest deployment)
 - [x] 3.4.2 Implement polling loop to check deployment status via Railway GraphQL API
   - **Verify**: Loop polls `https://backboard.railway.com/graphql/v2` for deployment status
-  - **Verify**: Uses `Authorization: Bearer $RAILWAY_TOKEN` header for authentication
+  - **Verify**: Uses `Project-Access-Token: $RAILWAY_TOKEN` header for authentication (required for project tokens)
   - **Verify**: Queries deployment object by ID: `query { deployment(id: "<id>") { status } }`
 - [x] 3.4.3 Fail job if deployment status becomes `FAILED`, `CRASHED`, or `REMOVED`
   - **Verify**: CI job fails on terminal failure states

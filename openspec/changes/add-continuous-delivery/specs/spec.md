@@ -336,7 +336,7 @@ The deployment process SHALL explicitly wait for and verify successful deploymen
 
 #### Scenario: Deployment Status Polling Configuration
 - **WHEN** polling Railway's GraphQL API for deployment status
-- **THEN** the workflow SHALL use the Railway project token for authentication via `Authorization: Bearer <token>` header
+- **THEN** the workflow SHALL use the Railway project token for authentication via `Project-Access-Token: <token>` header
 - **AND** it SHALL poll at 5-second intervals to balance responsiveness with API rate limits
 - **AND** it SHALL timeout after 5 minutes (60 attempts) if deployment does not reach a terminal state
 - **AND** on timeout, it SHALL fail the CI job and display recent deployment logs
