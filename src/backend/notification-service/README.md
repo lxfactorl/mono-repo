@@ -169,3 +169,21 @@ Logging is configured in `appsettings.json`:
 }
 ```
 
+### Local Development Secrets
+
+For local development, use `appsettings.Development.json` (which is excluded from Git) to store your Telegram tokens and Railway identifiers:
+
+```json
+{
+  "Telegram": {
+    "BotToken": "your-bot-token",
+    "ChatId": "your-chat-id"
+  },
+  "Railway": {
+    "ProjectId": "9c8aed22-5585-4e32-8f44-b503713988f1",
+    "ServiceId": "a57669d4-913d-418b-9602-0ee828e3f976"
+  }
+}
+```
+
+

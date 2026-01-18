@@ -119,15 +119,15 @@
 
 ### 2.3 Get Railway Credentials
 
-- [ ] 2.3.1 Navigate to Railway dashboard → Project Settings → Tokens
+- [x] 2.3.1 Navigate to Railway dashboard → Project Settings → Tokens
   - **Verify**: Tokens section is accessible
-- [ ] 2.3.2 Create new project token (NOT account token)
+- [x] 2.3.2 Create new project token (NOT account token)
   - **Verify**: New token appears in list with creation date
-- [ ] 2.3.3 Copy token value (will be used as `RAILWAY_TOKEN`)
-  - **Verify**: Token copied to clipboard or password manager
-- [ ] 2.3.4 Navigate to Service → Settings → copy Service ID
-  - **Verify**: Service ID is a UUID format (e.g., `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`)
-- [ ] 2.3.5 **Verify**: Both token and service ID saved securely (password manager or secure notes)
+- [x] 2.3.3 Copy token value (will be used as `RAILWAY_TOKEN`)
+  - **Verify**: Token copied to clipboard
+- [x] 2.3.4 Navigate to Service → Settings → copy Service ID
+  - **Verify**: Service ID is `a57669d4-913d-418b-9602-0ee828e3f976`
+- [x] 2.3.5 **Verify**: Both token and service ID saved securely
 
 ### 2.4 Create Railway Configuration File
 
@@ -145,13 +145,13 @@
 
 ### 2.5 Configure GitHub Secrets
 
-- [ ] 2.5.1 Navigate to GitHub repository → Settings → Secrets and variables → Actions
+- [x] 2.5.1 Navigate to GitHub repository → Settings → Secrets and variables → Actions
   - **Verify**: Actions secrets page is accessible
-- [ ] 2.5.2 Add new repository secret: `RAILWAY_TOKEN` with token from step 2.3.3
+- [x] 2.5.2 Add new repository secret: `RAILWAY_TOKEN` with token from step 2.3.3
   - **Verify**: Secret appears in list with "Updated just now" timestamp
-- [ ] 2.5.3 Add new repository secret: `RAILWAY_SERVICE_ID` with ID from step 2.3.4
+- [x] 2.5.3 Add new repository secret: `RAILWAY_SERVICE_ID` with ID from step 2.3.4
   - **Verify**: Secret appears in list with "Updated just now" timestamp
-- [ ] 2.5.4 **Verify**: Both secrets appear in "Repository secrets" section (2 secrets total)
+- [x] 2.5.4 **Verify**: Both secrets appear in "Repository secrets" section (2 secrets total)
 
 ## Phase 3: CI/CD Workflow Extension
 
