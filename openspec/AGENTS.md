@@ -404,6 +404,12 @@ notifications/spec.md
 - **Mocking**: Use NSubstitute to substitute external dependencies (ports/adapters).
 - **Visibility**: Classes and interfaces MUST be `internal` by default. Use `[InternalsVisibleTo]` in the source project to grant access to the test project.
 
+### Deployment Standards (Monorepo)
+- **Isolated Docker Builds**: All services MUST use a `Dockerfile` for deployment to ensure consistent SDK versions (e.g., .NET 10) and hermetic builds.
+- **Context Injection**: Since Railway uploads only the service directory, the CI workflow MUST copy shared root files (`Directory.Build.props`, `global.json`) into the service directory before running `railway up`.
+- **Health Checks**: Every service MUST implement a `/health` endpoint and configure `railway.json` with a `healthcheckPath` and a `healthcheckTimeout` (minimum 60s for .NET).
+- **Internal Networking**: Services intended for internal use MUST NOT be exposed to the public internet; use `<service>.railway.internal` for cross-service communication.
+
 ### Complexity Triggers
 Only add complexity with:
 - Performance data showing current solution too slow
