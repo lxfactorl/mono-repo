@@ -7,12 +7,14 @@ on:
       - 'src/backend/notification-service/**'
       - '.github/workflows/notification-service-ci.yml'
       - '.github/workflows/template-dotnet-ci.yml'
+      - '.github/templates/**'
   push:
     branches: [ master ]
     paths:
       - 'src/backend/notification-service/**'
       - '.github/workflows/notification-service-ci.yml'
       - '.github/workflows/template-dotnet-ci.yml'
+      - '.github/templates/**'
 
 permissions:
   contents: write
@@ -33,6 +35,7 @@ jobs:
             - 'src/backend/notification-service/**'
             - '.github/workflows/notification-service-ci.yml'
             - '.github/workflows/template-dotnet-ci.yml'
+            - '.github/templates/**'
 
 
   quality-gate:
