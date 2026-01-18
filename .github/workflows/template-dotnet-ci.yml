@@ -115,8 +115,27 @@ jobs:
 
       - name: Prepare Monorepo Context
         run: |
+          # Inject shared monorepo properties
           cp -f Directory.Build.props ${{ inputs.project_path }}/ 2>/dev/null || true
           cp -f global.json ${{ inputs.project_path }}/ 2>/dev/null || true
+          
+          # Provision standard Dockerfile if missing
+          if [ ! -f "${{ inputs.project_path }}/Dockerfile" ]; then
+            echo "📦 Provisioning standard Dockerfile from skeleton..."
+            cp .github/templates/dotnet-service.Dockerfile ${{ inputs.project_path }}/Dockerfile
+            # Customize the template for this service
+            sed -i "s|ExecutePlaceholder.dll|${{ inputs.service_name }}.dll|g" ${{ inputs.project_path }}/Dockerfile
+            sed -i "s|\${PROJECT_PATH}|${{ inputs.service_name }}/${{ inputs.service_name }}.csproj|g" ${{ inputs.project_path }}/Dockerfile
+          fi
+
+          # Provision standard railway.json if missing
+          if [ ! -f "${{ inputs.project_path }}/railway.json" ]; then
+            echo "🚂 Provisioning standard railway.json from skeleton..."
+            cp .github/templates/railway.json ${{ inputs.project_path }}/railway.json
+            sed -i "s|ExecutePlaceholder.dll|${{ inputs.service_name }}.dll|g" ${{ inputs.project_path }}/railway.json
+          fi
+
+
 
 
       - name: Install Railway CLI

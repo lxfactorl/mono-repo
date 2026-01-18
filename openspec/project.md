@@ -18,7 +18,8 @@ Monorepo serving as the root for multiple backend services and client-side appli
 - **Hosting**: Railway (Docker-based deployment)
 - **Source Control**: GitHub (public repository)
 - **Monorepo Tooling**: Shared build configuration at root level
-- **Deployment Strategy**: **Isolated Docker Builds** using official .NET 10 images. Shared monorepo context (`Directory.Build.props`, `global.json`) is injected into the service directory prior to deployment.
+- **Deployment Strategy**: **Isolated Docker Builds** using official .NET 10 images (Debian Slim runtime). Shared monorepo context (`Directory.Build.props`, `global.json`) is injected into the service directory prior to deployment.
+- **Zero-Config Skeleton**: Standard services leverage a shared deployment skeleton (`.github/templates/`) to automatically provision `Dockerfile` and `railway.json` if missing.
 
 
 ## Project Conventions
