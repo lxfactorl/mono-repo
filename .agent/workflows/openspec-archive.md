@@ -15,18 +15,26 @@ description: Archive a deployed OpenSpec change and update specs.
    - Otherwise, review the conversation, run `openspec list`, and ask the user which change to archive; wait for a confirmed change ID before proceeding.
    - If you still cannot identify a single change ID, stop and tell the user you cannot archive anything yet.
 2. Validate the change ID by running `openspec list` (or `openspec show <id>`) and stop if the change is missing, already archived, or otherwise not ready to archive.
-3. **Git Workflow Gate**: Verify the spec branch `spec/<id>` has been merged to `master` by running `git branch --merged master | grep spec/<id>`. If the branch is NOT merged, STOP and inform the user: "Cannot archive — branch `spec/<id>` must be merged to master first via pull request."
-4. Create a new branch for the archive: `git checkout -b archive/<id>` from `master`.
+3. **Git Workflow Gate**: Verify the spec branch `spec/<id>` has been merged to `master`. 
+   - Use `mcp_github-mcp-server_search_pull_requests` with query `head:spec/<id> is:pr state:merged` to confirm the PR is actually merged upstream.
+   - You may also double-check locally with `git branch --merged master | grep spec/<id>`.
+   - If the branch is NOT merged, STOP and inform the user: "Cannot archive — branch `spec/<id>` must be merged to master first via pull request."
+4. **Dedicated Archive Branch**: Archiving MUST run on a dedicated branch `archive/<id>`.
+   - Check your current branch with `git branch --show-current`.
+   - If you are on `master` or the old feature branch `spec/<id>`, you MUST switch to a new branch for the archive operation.
+   - Run `git checkout -b archive/<id> origin/master` (ensure you have latest master).
+   - If you cannot switch automatically, STOP and ask the user to create the `archive/<id>` branch.
 5. Run `openspec archive <id> --yes` so the CLI moves the change and applies spec updates without prompts (use `--skip-specs` only for tooling-only work).
 6. Review the command output to confirm the target specs were updated and the change landed in `changes/archive/`.
 7. Validate with `openspec validate --strict --no-interactive` and inspect with `openspec show <id>` if anything looks off.
 8. Commit the archive changes and create a PR to merge `archive/<id>` to `master`.
 
-**Issue Integration**
-- Before archiving, identify the linked issue in `proposal.md`.
-- Call `mcp_github-mcp-server_issue_read` to verify status.
-- If open, call `mcp_github-mcp-server_issue_write` with `state: closed` and label `openspec:archived`.
-- If child issues exist (per `design.md`), close them as well.
+**Issue Integration (Post-Archive)**
+- The primary workflow ends with the creation of the Archive PR (Step 8).
+- **Final Closure**: When the user confirms the Archive PR is merged:
+  1. Verify the Archive PR status using `mcp_github-mcp-server_search_pull_requests` (query `head:archive/<id> is:pr state:merged`).
+  2. If verified as merged, identify the linked issue from the proposal (now located in `openspec/changes/archive/...`).
+  3. Call `mcp_github-mcp-server_issue_write` to set `state: closed` and add label `openspec:archived`.
 
 **Reference**
 - Use `openspec list` to confirm change IDs before archiving.
