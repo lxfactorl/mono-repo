@@ -31,13 +31,9 @@ public static class ServiceBootstrap
             .AddInfrastructure(builder.Configuration);
 
 
-        // Telegram settings registration (conditional)
-        // Only enabled if BotToken is present to allow graceful fallback
-        var telegramSection = builder.Configuration.GetSection("Telegram");
-        if (!string.IsNullOrWhiteSpace(telegramSection.GetValue<string>("BotToken")))
-        {
-            builder.Services.AddValidatedOptions<TelegramSettings>(builder.Configuration, "Telegram");
-        }
+        // Telegram settings registration (mandatory)
+        // This will throw OptionsValidationException on startup if config is missing/invalid
+        builder.Services.AddValidatedOptions<TelegramSettings>(builder.Configuration, "Telegram");
 
         return builder;
     }
