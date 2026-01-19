@@ -55,6 +55,12 @@ Monorepo serving as the root for multiple backend services and client-side appli
   - **Modular DI**: Dependencies registered via extension methods in a `Bootstrap/` folder.
   - **Configuration**: Use "Validated Singleton Options" pattern (Data Annotations + `ValidateOnStart`).
   - **Clean Program.cs**: Entry point delegates setup to chained extension methods.
+  - **Exception Handling (MANDATORY)**: All services MUST implement global exception handling middleware using `IExceptionHandler`:
+    - Returns structured JSON error responses with `statusCode` and `message` properties
+    - Maps exception types to appropriate HTTP status codes (400, 404, 409, 500, etc.)
+    - In Development: includes detailed exception information (type, message, stack trace)
+    - In Production: returns generic error messages to avoid leaking sensitive information
+    - Example: See `NotificationService.Infrastructure.Middleware.GlobalExceptionHandler`
 - **Shared Configuration**: Root-level `.editorconfig`, `Directory.Build.props`, and analyzers apply to all projects.
 - Domain-Driven Design principles where applicable
 
