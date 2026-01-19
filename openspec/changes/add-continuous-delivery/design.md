@@ -14,20 +14,18 @@ flowchart TD
     C -->|No| D[Run CI Validation]
     D --> E{CI Passed?}
     E -->|No| Z
-    E -->|Yes| F[Parse Commits Since Last Tag]
+    E -->|Yes| F[Versionize: Analyze Commits]
     F --> G{Version Bump Needed?}
     G -->|No| H[Deploy Current Version]
-    G -->|Yes| I[Bump Version in .csproj]
-    I --> J[Generate CHANGELOG Entry]
-    J --> K["Commit with [skip ci]"]
-    K --> L[Push Commit]
+    G -->|Yes| I[Versionize: Bump .csproj]
+    I --> J[Versionize: Generate CHANGELOG]
+    J --> K["Versionize: Commit & Tag [skip ci]"]
+    K --> L[Push with Tags]
     L --> H
     H --> M[Deploy to Railway]
     M --> N{Deploy Success?}
-    N -->|No| O[Fail - No Tag Created]
-    N -->|Yes| P[Create Git Tag]
-    P --> Q[Push Tag]
-    Q --> R[Done]
+    N -->|No| O[Fail - Notification only]
+    N -->|Yes| R[Done]
 ```
 
 ## Constraints
@@ -70,18 +68,19 @@ flowchart TD
 - **Rejected**: Would force all services to share the same version, which doesn't fit our per-service deployment model
 
 ### Decision 2: Semantic Versioning Tool
-**Decision**: Use a custom script/action that parses git commits and updates `.csproj` files.
+**Decision**: Use `Versionize` (.NET Global Tool) for automated versioning and changelog generation.
 
 **Rationale**:
-- Full control over versioning logic
-- No external dependencies (GitVersion, semantic-release require Node.js or additional setup)
-- Can be implemented as a GitHub Actions step using bash/PowerShell
-- Matches our "boring technology" principle
+- **Industry Standard**: Dedicated .NET tool for Conventional Commits and SemVer.
+- **Native Integration**: Directly updates `.csproj` files without manual XML parsing.
+- **Monorepo Support**: Handles path-filtering and independent tag prefixes (e.g., `service/v1.0.0`) natively.
+- **Zero Scripts**: Replaces ~150 lines of custom Bash with a single, well-tested CLI tool.
+- **Maintainability**: Maintained by the .NET community; supports all Conventional Commit nuances (breaking changes, scopes, etc.).
 
 **Alternatives Considered**:
-- **GitVersion**: Powerful but adds complexity and requires configuration files
-- **semantic-release**: Node.js based, requires npm setup
-- **Custom script**: Simple, maintainable, fits our needs
+- **Custom scripts**: Rejected after evaluation; too much maintenance "glue" code for monorepo support.
+- **GitVersion**: Powerful but heavy configuration; complex for simple monorepo setups.
+- **standard-version**: Node-based; requires `npm` in .NET CI environment.
 
 ### Decision 3: Version Bump Logic
 **Decision**: Use Conventional Commits specification:
@@ -96,19 +95,12 @@ flowchart TD
 - Simple to implement and understand
 
 ### Decision 4: Changelog Generation
-**Decision**: Generate CHANGELOG.md using a custom script that:
-- Parses commits since last git tag
-- Groups by commit type (`feat:`, `fix:`, `chore:`, etc.)
-- Formats as markdown with sections: Added, Fixed, Changed, Other
-- Prepends to existing CHANGELOG.md (newest first)
+**Decision**: Use `Versionize` to update `CHANGELOG.md` files.
 
 **Rationale**:
-- Standard format (Keep a Changelog style)
-- Per-service changelogs (one per service directory)
-- Only includes commits affecting that service's paths
-
-**Alternative Considered**: Use `git-cliff` or similar tools
-- **Rejected**: Adds external dependency; custom script gives full control
+- **Consistency**: Uses the same commit analysis as the version bump.
+- **Standard Format**: Follows "Keep a Changelog" style automatically.
+- **Monorepo Aware**: Can be configured to generate changelogs per-service directory based on path-filtered commits.
 
 ### Decision 9: Railway Configuration File Format
 **Decision**: Use `railway.json` with JSON schema reference for each service.
@@ -178,10 +170,9 @@ flowchart TD
 
 ### Decision 6: Deployment Workflow Integration
 **Decision**: Extend the existing reusable workflow (`template-dotnet-ci.yml`) to include:
-1. Version bump job (runs before deployment)
-2. Changelog generation job (runs after version bump)
-3. Deployment job (runs after version/changelog commits)
-4. Git tag creation (runs after successful deployment)
+1. `Versionize` execution (Bump, Changelog, Commit, Tag)
+2. Deployment job (runs after successful release commit)
+3. Notification/Cleanup
 
 **Rationale**:
 - Reuses existing CI infrastructure

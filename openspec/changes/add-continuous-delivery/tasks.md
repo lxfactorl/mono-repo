@@ -227,67 +227,29 @@
   - **Verify**: Health endpoint `/health` is reachable and returns 200 OK after deployment
 
 
-## Phase 4: Version Management Scripts
+## Phase 4: Versioning Automation (Versionize Tool)
 
-> **Dependencies**: Phase 3 structure complete.
+### 4.1 Set up Versionize Tool
+- [ ] 4.1.1 Add step to install `Versionize` in reusable CI workflow
+  - **Verify**: `dotnet tool install --global Versionize` runs successfully
+- [ ] 4.1.2 Configure `Versionize` execution in `template-dotnet-ci.yml`
+  - **Verify**: Uses `--tag-template` for independent service tags
+  - **Verify**: Uses `--workingDir` for monorepo path-filtering
+  - **Verify**: Uses `--commit-message-template` with `[skip ci]`
 
-### 4.1 Create Version Bump Script
+### 4.2 Integrate Versioning into Workflow
+- [ ] 4.2.1 Implement `Versionize` step before Railway deployment
+  - **Verify**: Step correctly handles "insignificant commits" (no-bump cases)
+- [ ] 4.2.2 Add step to push release changes back to GitHub
+  - **Verify**: Pushes both the commit and the new tag (`git push --follow-tags`)
 
-- [ ] 4.1.1 Create directory: `.github/scripts/`
-  - **Verify**: Directory exists after creation
-- [ ] 4.1.2 Create file: `.github/scripts/bump-version.sh`
-  - **Verify**: File exists with shebang `#!/bin/bash`
-- [ ] 4.1.3 Implement: Extract current version from `.csproj` file
-  - **Verify**: Script can parse `<Version>1.0.0</Version>` correctly
-- [ ] 4.1.4 Implement: Get last git tag for service using pattern `<service-name>/v*`
-  - **Verify**: Script outputs correct tag or "no tag found"
-- [ ] 4.1.5 Implement: Handle first release (no previous tag) — use all commits or default to 1.0.0
-  - **Verify**: Script doesn't fail when no tags exist
-- [ ] 4.1.6 Implement: Parse commits since last tag for `feat:`, `fix:`, `BREAKING CHANGE:`
-  - **Verify**: Script correctly categorizes test commits
-- [ ] 4.1.7 Implement: Calculate new version (major/minor/patch bump)
-  - **Verify**: `feat:` → minor bump, `fix:` → patch bump, `BREAKING CHANGE:` → major bump
-- [ ] 4.1.8 Implement: Handle case when no version-bumping commits exist (exit gracefully)
-  - **Verify**: Script exits with code 0 and message "No version bump needed"
-- [ ] 4.1.9 Implement: Update version in `.csproj` file
-  - **Verify**: `.csproj` file modified with new version
-- [ ] 4.1.10 Make script executable: `chmod +x .github/scripts/bump-version.sh`
-  - **Verify**: `ls -la` shows executable permission
-- [ ] 4.1.11 **Verify**: Run script manually: `./bump-version.sh notification-service src/backend/notification-service` — outputs expected version
-
-### 4.2 Create Changelog Generator Script
-
-- [ ] 4.2.1 Create file: `.github/scripts/generate-changelog.sh`
-  - **Verify**: File exists with shebang `#!/bin/bash`
-- [ ] 4.2.2 Implement: Parse commits since last tag
-  - **Verify**: Script correctly lists commits between tags
-- [ ] 4.2.3 Implement: Group commits by type (Added, Fixed, Changed, Other)
-  - **Verify**: `feat:` → Added, `fix:` → Fixed, `refactor:` → Changed
-- [ ] 4.2.4 Implement: Format as markdown with version header and date
-  - **Verify**: Output includes `## [1.x.x] - YYYY-MM-DD` format
-- [ ] 4.2.5 Implement: Handle first release (create new CHANGELOG.md)
-  - **Verify**: Script creates file if it doesn't exist
-- [ ] 4.2.6 Implement: Prepend to existing CHANGELOG.md
-  - **Verify**: New entry appears at top, old entries preserved
-- [ ] 4.2.7 Make script executable: `chmod +x .github/scripts/generate-changelog.sh`
-  - **Verify**: `ls -la` shows executable permission
-- [ ] 4.2.8 **Verify**: Run script manually: `./generate-changelog.sh notification-service 1.1.0 src/backend/notification-service` — CHANGELOG.md updated correctly
-
-### 4.3 Integrate Scripts into Workflow
-
-- [ ] 4.3.1 Add workflow step to run version bump script
-  - **Verify**: Step runs `bash .github/scripts/bump-version.sh` with correct args
-- [ ] 4.3.2 Add workflow step to run changelog generator
-  - **Verify**: Step runs `bash .github/scripts/generate-changelog.sh` with correct args
-- [ ] 4.3.3 Add step to commit version + changelog with message: `chore(<service>): release v<version> [skip ci]`
-  - **Verify**: `git commit` command includes `[skip ci]` in message
-- [ ] 4.3.4 Add step to push commit using `GITHUB_TOKEN`
-  - **Verify**: Step uses `${{ secrets.GITHUB_TOKEN }}` or default token
-- [ ] 4.3.5 Add step to create git tag: `<service-name>/v<version>`
-  - **Verify**: `git tag` command uses correct naming pattern
-- [ ] 4.3.6 Add step to push git tag (only after successful deployment)
-  - **Verify**: Tag push step is AFTER Railway deployment step
-- [ ] 4.3.7 **Verify**: All steps in correct order: bump → changelog → commit → push → deploy → tag
+### 4.3 Validate Automation
+- [ ] 4.3.1 Create a test PR with a `feat:` commit
+  - **Verify**: Version is bumped to `1.1.0` and `CHANGELOG.md` is updated
+- [ ] 4.3.2 Create a test PR with a `fix:` commit
+  - **Verify**: Version is bumped to patch (e.g., `1.1.1`)
+- [ ] 4.3.3 Verify tag creation in GitHub after successful deploy
+  - **Verify**: Tag exists in format `notification-service/vX.Y.Z`
 
 ## Phase 5: Integration Testing
 
