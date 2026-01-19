@@ -35,7 +35,9 @@ on:
       RAILWAY_TOKEN:
         required: false
         description: "The Railway Project Token."
-
+      PAT_TOKEN:
+        required: false
+        description: "Personal Access Token for bypassing branch protection."
 
 
 jobs:
@@ -111,6 +113,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Needed for automated versioning and tags
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Install Versionize
         run: dotnet tool install --global Versionize
