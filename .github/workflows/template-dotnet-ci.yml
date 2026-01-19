@@ -110,7 +110,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Needed for automated versioning and tags later
+          fetch-depth: 0 # Needed for automated versioning and tags
+
+      - name: Install Versionize
+        run: dotnet tool install --global Versionize
+
+      - name: Versioning and Changelog
+        id: versionize
+        shell: bash
+        run: |
+          set -e
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Run versionize
+          # --exit-insignificant-commits: exits with non-zero if no changes
+          # --workingDir: filter commits by path
+          # --tag-template: format for the git tag
+          # --commit-message-template: format for the commit message
+          if versionize \
+            --workingRoot . \
+            --workingDir ${{ inputs.project_path }} \
+            --tag-template "${{ inputs.railway_service_name }}/v" \
+            --commit-message-template "chore(${{ inputs.railway_service_name }}): release v{version} [skip ci]" \
+            --exit-insignificant-commits; then
+            echo "version_bumped=true" >> $GITHUB_OUTPUT
+            
+            # Push the commit and the tag
+            # We use --follow-tags to push both the version bump commit and the new tag
+            git push origin master --follow-tags
+          else
+            echo "No significant changes found. Skipping version bump."
+            echo "version_bumped=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Prepare Monorepo Context
         run: |

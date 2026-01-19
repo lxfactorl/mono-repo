@@ -230,26 +230,44 @@
 ## Phase 4: Versioning Automation (Versionize Tool)
 
 ### 4.1 Set up Versionize Tool
-- [ ] 4.1.1 Add step to install `Versionize` in reusable CI workflow
+- [x] 4.1.1 Add step to install `Versionize` in reusable CI workflow
   - **Verify**: `dotnet tool install --global Versionize` runs successfully
-- [ ] 4.1.2 Configure `Versionize` execution in `template-dotnet-ci.yml`
+- [x] 4.1.2 Configure `Versionize` execution in `template-dotnet-ci.yml`
   - **Verify**: Uses `--tag-template` for independent service tags
   - **Verify**: Uses `--workingDir` for monorepo path-filtering
   - **Verify**: Uses `--commit-message-template` with `[skip ci]`
 
 ### 4.2 Integrate Versioning into Workflow
-- [ ] 4.2.1 Implement `Versionize` step before Railway deployment
+- [x] 4.2.1 Implement `Versionize` step before Railway deployment
   - **Verify**: Step correctly handles "insignificant commits" (no-bump cases)
-- [ ] 4.2.2 Add step to push release changes back to GitHub
+- [x] 4.2.2 Add step to push release changes back to GitHub
   - **Verify**: Pushes both the commit and the new tag (`git push --follow-tags`)
 
 ### 4.3 Validate Automation
-- [ ] 4.3.1 Create a test PR with a `feat:` commit
-  - **Verify**: Version is bumped to `1.1.0` and `CHANGELOG.md` is updated
-- [ ] 4.3.2 Create a test PR with a `fix:` commit
-  - **Verify**: Version is bumped to patch (e.g., `1.1.1`)
-- [ ] 4.3.3 Verify tag creation in GitHub after successful deploy
-  - **Verify**: Tag exists in format `notification-service/vX.Y.Z`
+- [ ] 4.3.1 Validate `feat:` (Minor Bump)
+  - **Step 1**: Create a new branch: `git checkout -b test/feat-versioning`
+  - **Step 2**: Add a comment to `src/backend/notification-service/NotificationService/Program.cs`
+  - **Step 3**: Commit with: `git commit -am "feat: add versioning test"`
+  - **Step 4**: Push and create PR targeting `master`
+  - **Step 5**: Merge the PR into `master` after CI passes
+  - **Step 6**: Go to GitHub Actions tab -> select `Notification Service CI` -> open the latest run on `master`
+  - **Verify**: In the `deploy` job, the `Versioning and Changelog` step output shows a version bump (e.g., `1.0.0` -> `1.1.0`)
+  - **Verify**: Open `src/backend/notification-service/CHANGELOG.md` in the `master` branch — it should contain the `feat: add versioning test` entry under a new version header
+  - **Verify**: Open `src/backend/notification-service/NotificationService/NotificationService.csproj` — the `<Version>` property should be updated to `1.1.0`
+
+- [ ] 4.3.2 Validate `fix:` (Patch Bump)
+  - **Step 1**: Create a new branch: `git checkout -b test/fix-versioning`
+  - **Step 2**: Update a comment in `src/backend/notification-service/NotificationService/Program.cs`
+  - **Step 3**: Commit with: `git commit -am "fix: patch versioning test"`
+  - **Step 4**: Push, create PR, and merge to `master`
+  - **Verify**: Check `NotificationService.csproj` — version should be `1.1.1` (assuming previous was `1.1.0`)
+  - **Verify**: Check `CHANGELOG.md` — should contain the `fix: patch versioning test` entry
+
+- [ ] 4.3.3 Verify GitHub Release Tag
+  - **Step 1**: Go to your GitHub repository main page
+  - **Step 2**: Click on the **"Tags"** link (usually next to the branch selector)
+  - **Step 3**: Or navigate directly to `https://github.com/lxfactorl/mono-repo/tags`
+  - **Verify**: A tag matching the pattern `notification-service/vX.Y.Z` exists for the merged commit
 
 ## Phase 5: Integration Testing
 
