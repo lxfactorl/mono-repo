@@ -130,7 +130,7 @@ jobs:
           # --commit-suffix: add skip ci to the commit message
           if versionize \
             --workingDir ${{ inputs.project_path }} \
-            --tag-template "${{ inputs.railway_service_name }}/v" \
+            --tag-template "${{ inputs.railway_service_name }}/v{version}" \
             --commit-suffix " [skip ci]" \
             --exit-insignificant-commits; then
             echo "version_bumped=true" >> $GITHUB_OUTPUT
