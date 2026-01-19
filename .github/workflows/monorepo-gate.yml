@@ -1,10 +1,11 @@
-name: monorepo-gate
+name: quality-gate
 on:
   pull_request:
     branches: [ master ]
 jobs:
-  quality-check:
-    name: quality-check
+  validate:
+    name: validate
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Gate Satisfied"
+      - name: skip-check
+        run: echo "⚠️ Global gate satisfied. Service-specific checks may still be running if code was changed."
