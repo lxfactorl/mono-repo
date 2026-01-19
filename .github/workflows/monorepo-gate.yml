@@ -1,11 +1,12 @@
-name: quality-gate
+name: monorepo-gate
 on:
   pull_request:
     branches: [ master ]
 jobs:
-  validate:
-    name: validate
-    runs-on: ubuntu-latest
-    steps:
-      - name: skip-check
-        run: echo "⚠️ Global gate satisfied. Service-specific checks may still be running if code was changed."
+  quality-gate:
+    uses: ./.github/workflows/template-dotnet-ci.yml
+    with:
+      service_name: 'Monorepo'
+      project_path: '.' 
+      bypass_checks: true
+    secrets: inherit
