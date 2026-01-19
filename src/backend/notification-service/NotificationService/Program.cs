@@ -1,3 +1,4 @@
+// Initializing Notification Service
 using Microsoft.AspNetCore.Builder;
 using NotificationService.Bootstrap;
 

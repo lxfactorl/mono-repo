@@ -2,13 +2,13 @@
 
 > **IMPORTANT**: Complete all prerequisite tasks BEFORE starting implementation phases.
 
-- [ ] 0.1 Read and understand `design.md` thoroughly
+- [x] 0.1 Read and understand `design.md` thoroughly
   - **Verify**: Can explain the CD workflow diagram to a colleague
-- [ ] 0.2 Confirm Railway account access and permissions
+- [x] 0.2 Confirm Railway account access and permissions
   - **Verify**: Can log in to https://railway.app/dashboard
-- [ ] 0.3 Confirm GitHub repository admin access (for secrets configuration)
+- [x] 0.3 Confirm GitHub repository admin access (for secrets configuration)
   - **Verify**: Can access repository Settings → Secrets and variables → Actions
-- [ ] 0.4 Review current `notification-service-ci.yml` workflow structure
+- [x] 0.4 Review current `notification-service-ci.yml` workflow structure
   - **Verify**: Can identify where deployment job will be added
 
 ## Phase 1: Service Preparation (Critical Blockers)
@@ -244,7 +244,7 @@
   - **Verify**: Pushes both the commit and the new tag (`git push --follow-tags`)
 
 ### 4.3 Validate Automation
-- [ ] 4.3.1 Validate `feat:` (Minor Bump)
+- [x] 4.3.1 Validate `feat:` (Minor Bump)
   - **Step 1**: Create a new branch: `git checkout -b test/feat-versioning`
   - **Step 2**: Add a comment to `src/backend/notification-service/NotificationService/Program.cs`
   - **Step 3**: Commit with: `git commit -am "feat: add versioning test"`
@@ -255,7 +255,7 @@
   - **Verify**: Open `src/backend/notification-service/CHANGELOG.md` in the `master` branch — it should contain the `feat: add versioning test` entry under a new version header
   - **Verify**: Open `src/backend/notification-service/NotificationService/NotificationService.csproj` — the `<Version>` property should be updated to `1.1.0`
 
-- [ ] 4.3.2 Validate `fix:` (Patch Bump)
+- [x] 4.3.2 Validate `fix:` (Patch Bump)
   - **Step 1**: Create a new branch: `git checkout -b test/fix-versioning`
   - **Step 2**: Update a comment in `src/backend/notification-service/NotificationService/Program.cs`
   - **Step 3**: Commit with: `git commit -am "fix: patch versioning test"`
@@ -263,7 +263,7 @@
   - **Verify**: Check `NotificationService.csproj` — version should be `1.1.1` (assuming previous was `1.1.0`)
   - **Verify**: Check `CHANGELOG.md` — should contain the `fix: patch versioning test` entry
 
-- [ ] 4.3.3 Verify GitHub Release Tag
+- [x] 4.3.3 Verify GitHub Release Tag
   - **Step 1**: Go to your GitHub repository main page
   - **Step 2**: Click on the **"Tags"** link (usually next to the branch selector)
   - **Step 3**: Or navigate directly to `https://github.com/lxfactorl/mono-repo/tags`
@@ -277,69 +277,69 @@
 
 > **Purpose**: Verify Railway CLI integration for local development workflow.
 
-- [ ] 5.0.1 Ensure Railway CLI is linked: `railway status`
+- [x] 5.0.1 Ensure Railway CLI is linked: `railway status`
   - **Verify**: Output shows project name and environment
-- [ ] 5.0.2 View variables from Railway: `railway variables`
-- [ ] 5.0.3 **Verify**: Telegram__BotToken and Telegram__ChatId are visible in output
-- [ ] 5.0.4 Run app locally with Railway secrets:
+- [x] 5.0.2 View variables from Railway: `railway variables`
+- [x] 5.0.3 **Verify**: Telegram__BotToken and Telegram__ChatId are visible in output
+- [x] 5.0.4 Run app locally with Railway secrets:
   ```bash
   cd src/backend/notification-service/NotificationService
   railway run dotnet run
   ```
-- [ ] 5.0.5 **Verify**: App starts without "missing configuration" or "null reference" errors
-- [ ] 5.0.6 Open Railway shell: `railway shell` and verify variables with `echo $Telegram__BotToken`
+- [x] 5.0.5 **Verify**: App starts without "missing configuration" or "null reference" errors
+- [x] 5.0.6 Open Railway shell: `railway shell` and verify variables with `echo $Telegram__BotToken`
   - **Verify**: Token value is printed (not empty)
-- [ ] 5.0.7 Document local development workflow in service README
+- [x] 5.0.7 Document local development workflow in service README
   - **Verify**: README includes `railway run` instructions
 
 ### 5.1 Local CI Validation
 
-- [ ] 5.1.1 Run local CI: `./ci.ps1 -ServicePath "src/backend/notification-service" -CoverageThreshold 80`
+- [x] 5.1.1 Run local CI: `./ci.ps1 -ServicePath "src/backend/notification-service" -CoverageThreshold 80`
   - **Verify**: Command executes without PowerShell errors
-- [ ] 5.1.2 Fix any format, build, or test errors
+- [x] 5.1.2 Fix any format, build, or test errors
   - **Verify**: All errors resolved, no warnings treated as errors
-- [ ] 5.1.3 **Verify**: Local CI passes — all checkmarks green, exit code 0
+- [x] 5.1.3 **Verify**: Local CI passes — all checkmarks green, exit code 0
 
 ### 5.2 Test PR Workflow
 
-- [ ] 5.2.1 Create test branch: `spec/plan-feature`
+- [x] 5.2.1 Create test branch: `spec/plan-feature`
   - **Verify**: Branch created with `git checkout -b spec/plan-feature`
-- [ ] 5.2.2 Make small change to `src/backend/notification-service/**`
+- [x] 5.2.2 Make small change to `src/backend/notification-service/**`
   - **Verify**: At least one file modified (e.g., add comment or update version)
-- [ ] 5.2.3 Create pull request to `master`
+- [x] 5.2.3 Create pull request to `master`
   - **Verify**: PR appears in GitHub with correct base branch
-- [ ] 5.2.4 **Verify**: CI workflow triggers — check GitHub Actions tab shows running workflow
-- [ ] 5.2.5 **Verify**: CI passes with green checkmark on PR
-- [ ] 5.2.6 **Verify**: Deployment job shows "Skipped" (not on master yet)
+- [x] 5.2.4 **Verify**: CI workflow triggers — check GitHub Actions tab shows running workflow
+- [x] 5.2.5 **Verify**: CI passes with green checkmark on PR
+- [x] 5.2.6 **Verify**: Deployment job shows "Skipped" (not on master yet)
 
 ### 5.3 Test Merge and Deployment
 
-- [ ] 5.3.1 Merge PR to `master`
-- [ ] 5.3.2 **Verify**: Deployment workflow triggers automatically
-- [ ] 5.3.3 **Verify**: Version is bumped in `.csproj`
-- [ ] 5.3.4 **Verify**: CHANGELOG.md is updated with new version entry
-- [ ] 5.3.5 **Verify**: CHANGELOG.md entry contains date and commit summaries
-- [ ] 5.3.6 **Verify**: Commit is pushed with `[skip ci]` message
-- [ ] 5.3.7 **Verify**: Railway deployment succeeds (check Railway dashboard)
-- [ ] 5.3.8 **Verify**: Git tag is created: `notification-service/v1.x.x`
-- [ ] 5.3.9 **Verify**: Health endpoint accessible on Railway URL
+- [x] 5.3.1 Merge PR to `master`
+- [x] 5.3.2 **Verify**: Deployment workflow triggers automatically
+- [x] 5.3.3 **Verify**: Version is bumped in `.csproj`
+- [x] 5.3.4 **Verify**: CHANGELOG.md is updated with new version entry
+- [x] 5.3.5 **Verify**: CHANGELOG.md entry contains date and commit summaries
+- [x] 5.3.6 **Verify**: Commit is pushed with `[skip ci]` message
+- [x] 5.3.7 **Verify**: Railway deployment succeeds (check Railway dashboard)
+- [x] 5.3.8 **Verify**: Git tag is created: `notification-service/v1.x.x`
+- [x] 5.3.9 **Verify**: Health endpoint accessible on Railway URL
 
 ### 5.4 Verify Railway Deployment (Internal Service)
 
 > **Note**: notification-service is internal only — NO public domain. Verification via logs and Railway dashboard.
 
-- [ ] 5.4.1 Open Railway dashboard → notification-service → Deployments
+- [x] 5.4.1 Open Railway dashboard → notification-service → Deployments
   - **Verify**: Deployments page loads with deployment list
-- [ ] 5.4.2 **Verify**: Latest deployment shows "Success" status (green indicator)
-- [ ] 5.4.3 **Verify**: Health check shows "Healthy" (green checkmark next to deployment)
-- [ ] 5.4.4 Open Railway dashboard → notification-service → Logs
+- [x] 5.4.2 **Verify**: Latest deployment shows "Success" status (green indicator)
+- [x] 5.4.3 **Verify**: Health check shows "Healthy" (green checkmark next to deployment)
+- [x] 5.4.4 Open Railway dashboard → notification-service → Logs
   - **Verify**: Logs tab loads with streaming logs
-- [ ] 5.4.5 **Verify**: Application startup logs show no `error` or `exception` keywords
-- [ ] 5.4.6 **Verify**: Logs show "Listening on http://[::]:PORT" or "Now listening on"
-- [ ] 5.4.7 (Optional) Use Railway CLI to view logs: `railway logs`
+- [x] 5.4.5 **Verify**: Application startup logs show no `error` or `exception` keywords
+- [x] 5.4.6 **Verify**: Logs show "Listening on http://[::]:PORT" or "Now listening on"
+- [x] 5.4.7 (Optional) Use Railway CLI to view logs: `railway logs`
   - **Verify**: Logs stream to terminal matching dashboard
-- [ ] 5.4.8 **Verify**: Service Settings → Networking shows NO public domain
-- [ ] 5.4.9 Document internal URL for future services: `http://notification-service.railway.internal`
+- [x] 5.4.8 **Verify**: Service Settings → Networking shows NO public domain
+- [x] 5.4.9 Document internal URL for future services: `http://notification-service.railway.internal`
   - **Verify**: URL noted in service README or team documentation
 
 ### 5.5 Verify Observability Features
@@ -347,25 +347,25 @@
 > **Purpose**: Confirm Railway's observability stack is working correctly.
 
 #### Logs Verification
-- [ ] 5.5.1 Open Railway dashboard → Observability tab (top navigation)
+- [x] 5.5.1 Open Railway dashboard → Observability tab (top navigation)
   - **Verify**: Observability page loads with Log Explorer
-- [ ] 5.5.2 **Verify**: Logs from notification-service appear in Log Explorer
-- [ ] 5.5.3 **Verify**: Logs are in JSON format — each line starts with `{` and contains `"level"` and `"message"`
-- [ ] 5.5.4 Test log filtering: enter `@level:info` in search box
+- [x] 5.5.2 **Verify**: Logs from notification-service appear in Log Explorer
+- [x] 5.5.3 **Verify**: Logs are in JSON format — each line starts with `{` and contains `"level"` and `"message"`
+- [x] 5.5.4 Test log filtering: enter `@level:info` in search box
   - **Verify**: Only info-level logs shown, others filtered out
-- [ ] 5.5.5 Test log filtering: enter `@level:error` in search box
+- [x] 5.5.5 Test log filtering: enter `@level:error` in search box
   - **Verify**: Only error-level logs shown (or "no results" if no errors)
-- [ ] 5.5.6 **Verify**: Custom attributes are searchable — test with app-specific attribute if available
+- [x] 5.5.6 **Verify**: Custom attributes are searchable — test with app-specific attribute if available
 
 #### Metrics Verification
-- [ ] 5.5.7 Open Railway dashboard → notification-service → Metrics tab
-- [ ] 5.5.8 **Verify**: CPU usage graph is visible
-- [ ] 5.5.9 **Verify**: Memory usage graph is visible
-- [ ] 5.5.10 **Verify**: Network I/O graph is visible
-- [ ] 5.5.11 **Verify**: Deployment markers appear on graphs (dotted lines)
+- [x] 5.5.7 Open Railway dashboard → notification-service → Metrics tab
+- [x] 5.5.8 **Verify**: CPU usage graph is visible
+- [x] 5.5.9 **Verify**: Memory usage graph is visible
+- [x] 5.5.10 **Verify**: Network I/O graph is visible
+- [x] 5.5.11 **Verify**: Deployment markers appear on graphs (dotted lines)
 
 #### Log Search Examples (Document for future reference)
-- [ ] 5.5.12 Document useful log queries:
+- [x] 5.5.12 Document useful log queries:
   - All errors: `@level:error`
   - Telegram provider logs: `"telegram"` or `@provider:telegram`
   - Specific time range: Use date picker in Log Explorer
@@ -374,18 +374,18 @@
 
 > **Purpose**: Verify SSH and logs access work for production debugging.
 
-- [ ] 5.6.1 View deployment logs via CLI: `railway logs`
+- [x] 5.6.1 View deployment logs via CLI: `railway logs`
   - **Verify**: Command executes without errors
-- [ ] 5.6.2 **Verify**: Logs stream to terminal — new log lines appear as app runs
-- [ ] 5.6.3 View build logs: `railway logs --build`
+- [x] 5.6.2 **Verify**: Logs stream to terminal — new log lines appear as app runs
+- [x] 5.6.3 View build logs: `railway logs --build`
   - **Verify**: Build output shown (dotnet restore, build steps)
-- [ ] 5.6.4 SSH into running container: `railway ssh`
+- [x] 5.6.4 SSH into running container: `railway ssh`
   - **Verify**: Command connects without timeout
-- [ ] 5.6.5 **Verify**: Shell prompt appears — shows `#` or `$` prompt
-- [ ] 5.6.6 Execute single command: `railway ssh -- ls /app`
+- [x] 5.6.5 **Verify**: Shell prompt appears — shows `#` or `$` prompt
+- [x] 5.6.6 Execute single command: `railway ssh -- ls /app`
   - **Verify**: Command returns file listing
-- [ ] 5.6.7 **Verify**: App files visible — `NotificationService.dll` in listing
-- [ ] 5.6.8 Document SSH debugging workflow in CI/CD overview
+- [x] 5.6.7 **Verify**: App files visible — `NotificationService.dll` in listing
+- [x] 5.6.8 Document SSH debugging workflow in CI/CD overview
   - **Verify**: SSH section added to `docs/ci-cd/README.md`
 
 ## Phase 6: Documentation Updates
@@ -394,88 +394,88 @@
 
 ### 6.1 Update Project Documentation
 
-- [ ] 6.1.1 Open `openspec/project.md`
+- [x] 6.1.1 Open `openspec/project.md`
   - **Verify**: File opens without errors
-- [ ] 6.1.2 Add section: "CD Workflow Conventions"
+- [x] 6.1.2 Add section: "CD Workflow Conventions"
   - **Verify**: Section heading exists with `##` markdown
-- [ ] 6.1.3 Document path filtering requirements
+- [x] 6.1.3 Document path filtering requirements
   - **Verify**: Path filter explanation present with examples
-- [ ] 6.1.4 Document Railway deployment process
+- [x] 6.1.4 Document Railway deployment process
   - **Verify**: Step-by-step deployment flow documented
 
 ### 6.2 Update Service Documentation
 
-- [ ] 6.2.1 Open `src/backend/notification-service/README.md`
+- [x] 6.2.1 Open `src/backend/notification-service/README.md`
   - **Verify**: File opens without errors
-- [ ] 6.2.2 Add section: "Deployment to Railway"
+- [x] 6.2.2 Add section: "Deployment to Railway"
   - **Verify**: Section explains deployment is automatic on merge to master
-- [ ] 6.2.3 Document Railway Variables setup
+- [x] 6.2.3 Document Railway Variables setup
   - **Verify**: Lists required variables: `Telegram__BotToken`, `Telegram__ChatId`
-- [ ] 6.2.4 Document health endpoint
+- [x] 6.2.4 Document health endpoint
   - **Verify**: Documents `/health` endpoint and its purpose
 
 ### 6.3 Create CI/CD Overview Document
 
-- [ ] 6.3.1 Create directory: `docs/ci-cd/`
+- [x] 6.3.1 Create directory: `docs/ci-cd/`
   - **Verify**: Directory exists after creation
-- [ ] 6.3.2 Create file: `docs/ci-cd/README.md` (CI/CD Overview)
+- [x] 6.3.2 Create file: `docs/ci-cd/README.md` (CI/CD Overview)
   - **Verify**: File exists with title and introduction
-- [ ] 6.3.3 Document high-level CD workflow (diagram from design.md)
+- [x] 6.3.3 Document high-level CD workflow (diagram from design.md)
   - **Verify**: Mermaid diagram or image included
-- [ ] 6.3.4 Document workflow file structure (template vs caller pattern)
+- [x] 6.3.4 Document workflow file structure (template vs caller pattern)
   - **Verify**: Explains `template-dotnet-ci.yml` and caller workflow relationship
-- [ ] 6.3.5 Document versioning strategy (semantic versioning, changelog)
+- [x] 6.3.5 Document versioning strategy (semantic versioning, changelog)
   - **Verify**: Explains `feat:` → minor, `fix:` → patch, `BREAKING CHANGE:` → major
-- [ ] 6.3.6 Document git tagging convention (`<service-name>/v<version>`)
+- [x] 6.3.6 Document git tagging convention (`<service-name>/v<version>`)
   - **Verify**: Shows example: `notification-service/v1.2.3`
-- [ ] 6.3.7 Document secrets management (GitHub secrets vs Railway Variables)
+- [x] 6.3.7 Document secrets management (GitHub secrets vs Railway Variables)
   - **Verify**: Table or list distinguishing CI secrets vs app secrets
-- [ ] 6.3.8 Document observability strategy:
+- [x] 6.3.8 Document observability strategy:
   - Structured JSON logging format and configuration
   - Railway Log Explorer and filtering syntax (`@level:error`, `@attribute:value`)
   - Built-in metrics (CPU, Memory, Network) location in dashboard
   - Useful log queries for debugging
   - **Verify**: All 4 sub-items documented with examples
-- [ ] 6.3.9 Document Railway CLI for local development:
+- [x] 6.3.9 Document Railway CLI for local development:
   - Installation and login
   - `railway run` for running with production secrets
   - `railway shell` for shell access
   - `railway variables` for viewing config
   - **Verify**: All 4 commands documented with examples
-- [ ] 6.3.10 Document Railway CLI for production debugging:
+- [x] 6.3.10 Document Railway CLI for production debugging:
   - `railway logs` for viewing logs
   - `railway ssh` for container access
   - SSH limitations and best practices
   - **Verify**: All 3 items documented with examples
-- [ ] 6.3.11 Link to OpenSpec `ci-pipeline` spec for detailed requirements
+- [x] 6.3.11 Link to OpenSpec `ci-pipeline` spec for detailed requirements
   - **Verify**: Link points to correct spec file
 
 ### 6.4 Create Service Onboarding Guide
 
-- [ ] 6.4.1 Create file: `docs/ci-cd/adding-service-to-cd.md`
+- [x] 6.4.1 Create file: `docs/ci-cd/adding-service-to-cd.md`
   - **Verify**: File exists with title and introduction
-- [ ] 6.4.2 Document step-by-step guide for adding new service
+- [x] 6.4.2 Document step-by-step guide for adding new service
   - **Verify**: Numbered steps from start to finish
-- [ ] 6.4.3 Include workflow file template (copy-paste ready)
+- [x] 6.4.3 Include workflow file template (copy-paste ready)
   - **Verify**: YAML code block with placeholders marked (e.g., `<SERVICE_NAME>`)
-- [ ] 6.4.4 Include railway.json template
+- [x] 6.4.4 Include railway.json template
   - **Verify**: JSON code block with all required fields
-- [ ] 6.4.5 Document GitHub secrets configuration steps
+- [x] 6.4.5 Document GitHub secrets configuration steps
   - **Verify**: Screenshots or step descriptions for Settings → Secrets
-- [ ] 6.4.6 Document Railway Variables configuration steps
+- [x] 6.4.6 Document Railway Variables configuration steps
   - **Verify**: Screenshots or step descriptions for Railway dashboard
-- [ ] 6.4.7 Include checklist for service readiness (health endpoint, version property)
+- [x] 6.4.7 Include checklist for service readiness (health endpoint, version property)
   - **Verify**: Checkbox list with all prerequisites from Phase 1
 
 ### 6.5 Verify Documentation Completeness
 
-- [ ] 6.5.1 Review all documentation for accuracy
+- [x] 6.5.1 Review all documentation for accuracy
   - **Verify**: No placeholder text like `TODO` or `TBD` remains
-- [ ] 6.5.2 Verify all links work correctly
+- [x] 6.5.2 Verify all links work correctly
   - **Verify**: Click each link — no 404 errors
-- [ ] 6.5.3 Verify code examples are correct
+- [x] 6.5.3 Verify code examples are correct
   - **Verify**: YAML/JSON examples have valid syntax
-- [ ] 6.5.4 **Verify**: A new developer could follow guides to add a new service (walkthrough test)
+- [x] 6.5.4 **Verify**: A new developer could follow guides to add a new service (walkthrough test)
 
 ---
 
@@ -483,17 +483,17 @@
 
 All items below MUST be verified before archiving this change:
 
-- [ ] All Phase 1-6 tasks marked complete
-- [ ] Local CI passes: `./ci.ps1 -ServicePath "src/backend/notification-service"`
-- [ ] Test PR created, merged, and deployed successfully
-- [ ] Git tag exists: `notification-service/v1.x.x`
-- [ ] Railway deployment shows "Success" with healthy status
-- [ ] Service is internal only (no public domain)
-- [ ] Railway logs show successful startup in JSON format
-- [ ] Railway metrics visible (CPU, Memory, Network)
-- [ ] Log filtering works in Railway Observability tab
-- [ ] Documentation updated and reviewed
-- [ ] No workflow errors in GitHub Actions history
+- [x] All Phase 1-6 tasks marked complete
+- [x] Local CI passes: `./ci.ps1 -ServicePath "src/backend/notification-service"`
+- [x] Test PR created, merged, and deployed successfully
+- [x] Git tag exists: `notification-service/v1.x.x`
+- [x] Railway deployment shows "Success" with healthy status
+- [x] Service is internal only (no public domain)
+- [x] Railway logs show successful startup in JSON format
+- [x] Railway metrics visible (CPU, Memory, Network)
+- [x] Log filtering works in Railway Observability tab
+- [x] Documentation updated and reviewed
+- [x] No workflow errors in GitHub Actions history
 
 ---
 
