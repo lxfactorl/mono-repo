@@ -127,12 +127,11 @@ jobs:
           # --exit-insignificant-commits: exits with non-zero if no changes
           # --workingDir: filter commits by path
           # --tag-template: format for the git tag
-          # --commit-message-template: format for the commit message
+          # --commit-suffix: add skip ci to the commit message
           if versionize \
-            --workingRoot . \
             --workingDir ${{ inputs.project_path }} \
             --tag-template "${{ inputs.railway_service_name }}/v" \
-            --commit-message-template "chore(${{ inputs.railway_service_name }}): release v{version} [skip ci]" \
+            --commit-suffix " [skip ci]" \
             --exit-insignificant-commits; then
             echo "version_bumped=true" >> $GITHUB_OUTPUT
             
