@@ -1,0 +1,36 @@
+name: Technical Debt
+description: Capture technical debt or refactoring work.
+labels: ["type:tech-debt", "backlog"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of Debt
+      description: Describe the technical debt or area for refactoring.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact if not addressed
+      description: What are the risks or costs of leaving this debt?
+    validations:
+      required: true
+  - type: dropdown
+    id: affected-service
+    attributes:
+      label: Affected Service
+      options:
+        - notification-service
+        - shared
+        - infrastructure
+        - global
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-remediation
+    attributes:
+      label: Proposed Remediation
+      description: How should we fix this?
+    validations:
+      required: false

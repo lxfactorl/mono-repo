@@ -3,8 +3,10 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  quality-check:
-    name: quality-check
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Gate Satisfied"
+  quality-gate:
+    uses: ./.github/workflows/template-dotnet-ci.yml
+    with:
+      service_name: 'Monorepo'
+      project_path: '.' 
+      bypass_checks: true
+    secrets: inherit

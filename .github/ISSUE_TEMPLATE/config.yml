@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: OpenSpec Discussion
+    url: https://github.com/lxfactorl/mono-repo/discussions
+    about: Please use discussions for general questions or architectural debates.
