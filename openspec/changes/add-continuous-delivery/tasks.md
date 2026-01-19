@@ -126,7 +126,7 @@
 - [x] 2.3.3 Copy token value (will be used as `RAILWAY_TOKEN`)
   - **Verify**: Token copied to clipboard
 - [x] 2.3.4 Navigate to Service → Settings → copy Service ID
-  - **Verify**: Service ID is `a57669d4-913d-418b-9602-0ee828e3f976`
+  - **Verify**: Service ID is `bdee0121-e4a0-4dce-bf72-09c233e90d44`
 - [x] 2.3.5 **Verify**: Both token and service ID saved securely
 
 ### 2.4 Create Railway Configuration File

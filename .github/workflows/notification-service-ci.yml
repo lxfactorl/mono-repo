@@ -49,6 +49,7 @@ jobs:
       bypass_checks: ${{ needs.changes.outputs.service != 'true' }}
       enable_deploy: true
       railway_service_name: 'notification-service'
+      railway_service_id: ${{ vars.RAILWAY_SERVICE_ID }}
     secrets: inherit
 
 

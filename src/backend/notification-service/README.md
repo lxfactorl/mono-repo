@@ -183,7 +183,7 @@ For local development, use `appsettings.Development.json` (which is excluded fro
   },
   "Railway": {
     "ProjectId": "9c8aed22-5585-4e32-8f44-b503713988f1",
-    "ServiceId": "a57669d4-913d-418b-9602-0ee828e3f976"
+    "ServiceId": "bdee0121-e4a0-4dce-bf72-09c233e90d44"
   }
 }
 ```
