@@ -1,7 +1,10 @@
 using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using NotificationService.Api.Models.Responses;
+using FluentAssertions;
+using Xunit;
 
 namespace NotificationService.Tests.Integration.Infrastructure.Middleware;
 
@@ -23,13 +26,23 @@ public class GlobalExceptionHandlerTests : IClassFixture<WebApplicationFactory<P
     public async Task ExceptionHandler_IsRegistered_HealthEndpointWorks()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        using var client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Telegram:BotToken"] = "123456:FAKE-TOKEN",
+                    ["Telegram:ChatId"] = "123456789"
+                });
+            });
+        }).CreateClient();
 
         // Act
         var response = await client.GetAsync(new Uri("/health", UriKind.Relative));
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -49,12 +62,12 @@ public class GlobalExceptionHandlerTests : IClassFixture<WebApplicationFactory<P
         };
 
         // Assert
-        Assert.Equal(500, errorResponse.StatusCode);
-        Assert.Equal("Test error", errorResponse.Message);
-        Assert.NotNull(errorResponse.Exception);
-        Assert.Equal("TestException", errorResponse.Exception.Type);
-        Assert.Equal("Test exception message", errorResponse.Exception.Message);
-        Assert.Equal("Test stack trace", errorResponse.Exception.StackTrace);
+        errorResponse.StatusCode.Should().Be(500);
+        errorResponse.Message.Should().Be("Test error");
+        errorResponse.Exception.Should().NotBeNull();
+        errorResponse.Exception.Type.Should().Be("TestException");
+        errorResponse.Exception.Message.Should().Be("Test exception message");
+        errorResponse.Exception.StackTrace.Should().Be("Test stack trace");
     }
 
     [Fact]
@@ -79,13 +92,13 @@ public class GlobalExceptionHandlerTests : IClassFixture<WebApplicationFactory<P
         var root = document.RootElement;
 
         // Assert
-        Assert.Equal(500, root.GetProperty("statusCode").GetInt32());
-        Assert.Equal("Test error", root.GetProperty("message").GetString());
+        root.GetProperty("statusCode").GetInt32().Should().Be(500);
+        root.GetProperty("message").GetString().Should().Be("Test error");
 
         var exception = root.GetProperty("exception");
-        Assert.Equal("TestException", exception.GetProperty("type").GetString());
-        Assert.Equal("Test exception message", exception.GetProperty("message").GetString());
-        Assert.Equal("Test stack trace", exception.GetProperty("stackTrace").GetString());
+        exception.GetProperty("type").GetString().Should().Be("TestException");
+        exception.GetProperty("message").GetString().Should().Be("Test exception message");
+        exception.GetProperty("stackTrace").GetString().Should().Be("Test stack trace");
     }
 
     [Fact]
@@ -105,12 +118,12 @@ public class GlobalExceptionHandlerTests : IClassFixture<WebApplicationFactory<P
         var root = document.RootElement;
 
         // Assert
-        Assert.Equal(500, root.GetProperty("statusCode").GetInt32());
-        Assert.Equal("An internal server error occurred. Please try again later.", root.GetProperty("message").GetString());
+        root.GetProperty("statusCode").GetInt32().Should().Be(500);
+        root.GetProperty("message").GetString().Should().Be("An internal server error occurred. Please try again later.");
 
         // Verify exception property is present but null
-        Assert.True(root.TryGetProperty("exception", out var exceptionProperty));
-        Assert.Equal(JsonValueKind.Null, exceptionProperty.ValueKind);
+        root.TryGetProperty("exception", out var exceptionProperty).Should().BeTrue();
+        exceptionProperty.ValueKind.Should().Be(JsonValueKind.Null);
     }
 
     [Fact]
@@ -125,8 +138,8 @@ public class GlobalExceptionHandlerTests : IClassFixture<WebApplicationFactory<P
         };
 
         // Assert
-        Assert.Equal("TestException", exceptionDetails.Type);
-        Assert.Equal("Test message", exceptionDetails.Message);
-        Assert.Null(exceptionDetails.StackTrace);
+        exceptionDetails.Type.Should().Be("TestException");
+        exceptionDetails.Message.Should().Be("Test message");
+        exceptionDetails.StackTrace.Should().BeNull();
     }
 }

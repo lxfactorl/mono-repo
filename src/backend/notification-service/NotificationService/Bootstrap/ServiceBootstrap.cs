@@ -35,7 +35,7 @@ public static class ServiceBootstrap
             // }
         });
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-        builder.Services.AddProblemDetails();
+        builder.Services.AddProblemDetails(); // Required for UseExceptionHandler() middleware
 
         // 3. OpenAPI & Scalar
         builder.Services.AddOpenApi();

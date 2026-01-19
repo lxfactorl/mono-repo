@@ -12,6 +12,7 @@ using System.Net.Http.Json;
 using NotificationService.Infrastructure.Middleware;
 using NSubstitute;
 using Xunit;
+using FluentAssertions;
 
 namespace NotificationService.Tests.Integration.Infrastructure.Middleware;
 
@@ -55,20 +56,20 @@ public class ExceptionHandlingIntegrationTests : IClassFixture<WebApplicationFac
         var response = await client.PostAsJsonAsync("/notify", new NotifyRequest("test@test.com", "msg"));
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var json = await response.Content.ReadAsStringAsync();
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
 
-        Assert.Equal(500, root.GetProperty("statusCode").GetInt32());
-        Assert.Equal("An internal server error occurred. Please try again later.", root.GetProperty("message").GetString());
+        root.GetProperty("statusCode").GetInt32().Should().Be(500);
+        root.GetProperty("message").GetString().Should().Be("An internal server error occurred. Please try again later.");
 
         // In Development, we expect an 'exception' property
-        Assert.True(root.TryGetProperty("exception", out var exceptionProp));
-        Assert.Equal("Exception", exceptionProp.GetProperty("type").GetString());
-        Assert.Equal(exceptionMessage, exceptionProp.GetProperty("message").GetString());
-        Assert.True(exceptionProp.TryGetProperty("stackTrace", out _));
+        root.TryGetProperty("exception", out var exceptionProp).Should().BeTrue();
+        exceptionProp.GetProperty("type").GetString().Should().Be("Exception");
+        exceptionProp.GetProperty("message").GetString().Should().Be(exceptionMessage);
+        exceptionProp.TryGetProperty("stackTrace", out _).Should().BeTrue();
     }
 
     [Fact]
@@ -101,19 +102,19 @@ public class ExceptionHandlingIntegrationTests : IClassFixture<WebApplicationFac
         var response = await client.PostAsJsonAsync("/notify", new NotifyRequest("test@test.com", "msg"));
 
         // Assert
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
 
         var json = await response.Content.ReadAsStringAsync();
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
 
-        Assert.Equal(500, root.GetProperty("statusCode").GetInt32());
-        Assert.Equal("An internal server error occurred. Please try again later.", root.GetProperty("message").GetString());
+        root.GetProperty("statusCode").GetInt32().Should().Be(500);
+        root.GetProperty("message").GetString().Should().Be("An internal server error occurred. Please try again later.");
 
         // In Production, exception property should be null or missing
         if (root.TryGetProperty("exception", out var exceptionProp))
         {
-            Assert.Equal(JsonValueKind.Null, exceptionProp.ValueKind);
+            exceptionProp.ValueKind.Should().Be(JsonValueKind.Null);
         }
     }
 
@@ -155,17 +156,17 @@ public class ExceptionHandlingIntegrationTests : IClassFixture<WebApplicationFac
         var response = await client.PostAsJsonAsync("/notify", new NotifyRequest("test@test.com", "msg"));
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
         var json = await response.Content.ReadAsStringAsync();
         using var document = JsonDocument.Parse(json);
         var root = document.RootElement;
 
-        Assert.Equal(400, root.GetProperty("statusCode").GetInt32());
-        Assert.Equal("Custom Bad Request Message", root.GetProperty("message").GetString());
+        root.GetProperty("statusCode").GetInt32().Should().Be(400);
+        root.GetProperty("message").GetString().Should().Be("Custom Bad Request Message");
 
         // Even with custom mapping, dev mode might add details. Let's verify.
-        Assert.True(root.TryGetProperty("exception", out var exceptionProp));
-        Assert.Equal("ArgumentException", exceptionProp.GetProperty("type").GetString());
+        root.TryGetProperty("exception", out var exceptionProp).Should().BeTrue();
+        exceptionProp.GetProperty("type").GetString().Should().Be("ArgumentException");
     }
 }
