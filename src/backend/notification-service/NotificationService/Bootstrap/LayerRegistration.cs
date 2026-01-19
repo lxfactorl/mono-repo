@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using NotificationService.Api.Models.Settings;
 using NotificationService.Application.Interfaces;
 using NotificationService.Application.Services;
@@ -34,12 +36,17 @@ public static class LayerRegistration
 
         if (!string.IsNullOrWhiteSpace(botToken))
         {
+            Log.Information("Telegram provider enabled for NotificationService.");
             // Register TelegramBotClient with the configured token
             services.AddSingleton<ITelegramBotClient>(sp => new TelegramBotClient(botToken));
 
             // Register adapter and provider
             services.AddScoped<ITelegramMessenger, TelegramBotAdapter>();
             services.AddScoped<INotificationProvider, TelegramProvider>();
+        }
+        else
+        {
+            Log.Warning("Telegram provider skipped: No BotToken found in configuration.");
         }
 
         return services;
