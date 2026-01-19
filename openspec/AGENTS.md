@@ -491,4 +491,30 @@ openspec validate --strict --no-interactive  # Is it correct?
 openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
 ```
 
-Remember: Specs are truth. Changes are proposals. Keep them in sync.
+## Issue Tracking & Backlog
+
+The project integrates GitHub Issues for backlog management and real-time discovery tracking.
+
+### Discovery & Capture
+- If a bug, feature idea, or technical debt is identified during implementation, **Antigravity MUST NOT** add TODOs to the code.
+- Instead, use `/openspec-issue-track` to capture it as a GitHub Issue in the backlog.
+
+### Mandatory Linking
+- **Antigravity MUST NOT** start an OpenSpec proposal without an associated GitHub Issue.
+- Use `/openspec-spec-create` to search for or create the required issue before scaffolding.
+- The `proposal.md` MUST include a `Relates to #N` reference in the `## Linked Issue` section.
+
+### Automated Sync
+- After a `git push` to a spec branch, Antigravity SHALL prompt to sync `tasks.md` to the GitHub Issue.
+- This ensures the issue's task list reflects the latest implementation progress.
+
+### Slash Commands Summary
+
+| Command | Use Case |
+| :--- | :--- |
+| `/openspec-issue-track` | Quick capture of a bug or idea into the backlog. |
+| `/openspec-spec-create` | Start a new spec with mandatory issue linking/creation. |
+| `/openspec-spec-from-issue` | Promote a backlog issue directly to a spec proposal. |
+| `/openspec-spec-cancel` | Abandon a spec and revert/close the associated issue. |
+
+Remember: Specs are truth. Changes are proposals. Issues are the backlog. Keep them in sync.

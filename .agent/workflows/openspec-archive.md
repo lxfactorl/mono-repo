@@ -22,6 +22,12 @@ description: Archive a deployed OpenSpec change and update specs.
 7. Validate with `openspec validate --strict --no-interactive` and inspect with `openspec show <id>` if anything looks off.
 8. Commit the archive changes and create a PR to merge `archive/<id>` to `master`.
 
+**Issue Integration**
+- Before archiving, identify the linked issue in `proposal.md`.
+- Call `mcp_github-mcp-server_issue_read` to verify status.
+- If open, call `mcp_github-mcp-server_issue_write` with `state: closed` and label `openspec:archived`.
+- If child issues exist (per `design.md`), close them as well.
+
 **Reference**
 - Use `openspec list` to confirm change IDs before archiving.
 - Inspect refreshed specs with `openspec list --specs` and address any validation issues before handing off.
