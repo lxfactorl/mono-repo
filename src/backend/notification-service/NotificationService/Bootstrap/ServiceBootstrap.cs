@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using NotificationService.Api.Endpoints;
 using NotificationService.Api.Models.Settings;
 using NotificationService.Infrastructure.Common;
+using NotificationService.Infrastructure.Middleware;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -21,10 +22,25 @@ public static class ServiceBootstrap
             loggerConfiguration.ReadFrom.Configuration(context.Configuration);
         });
 
-        // 2. OpenAPI & Scalar
+        // 2. Exception Handling
+        builder.Services.AddSingleton(new GlobalExceptionHandlerOptions
+        {
+            // Example: Map multiple custom exception types using a switch expression
+            // CustomExceptionMapper = exception => exception switch
+            // {
+            //     ValidationException => (400, "Validation failed. Please check your input."),
+            //     NotFoundException => (404, "The requested resource was not found."),
+            //     BusinessRuleException => (422, "Business rule violation occurred."),
+            //     _ => null  // Return null to use default mapping for unhandled types
+            // }
+        });
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails(); // Required for UseExceptionHandler() middleware
+
+        // 3. OpenAPI & Scalar
         builder.Services.AddOpenApi();
 
-        // 3. Layered DI & Settings
+        // 4. Layered DI & Settings
         builder.Services
             .AddValidatedOptions<AppNotificationSettings>(builder.Configuration, "NotificationSettings")
             .AddApplication()
@@ -42,17 +58,20 @@ public static class ServiceBootstrap
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        // 1. Documentation UI
+        // 1. Exception Handling (must be early in pipeline)
+        app.UseExceptionHandler();
+
+        // 2. Documentation UI
         app.MapOpenApi();
         app.MapScalarApiReference();
 
-        // 2. Health Check (Railway deployment verification)
+        // 3. Health Check (Railway deployment verification)
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
             .WithName("HealthCheck")
             .WithTags("Infrastructure")
             .WithDescription("Health check endpoint for deployment verification");
 
-        // 3. Endpoints
+        // 4. Endpoints
         app.MapNotificationEndpoints();
 
         return app;
