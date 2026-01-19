@@ -43,11 +43,8 @@ public static class ServiceBootstrap
         ArgumentNullException.ThrowIfNull(app);
 
         // 1. Documentation UI
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapOpenApi();
-            app.MapScalarApiReference();
-        }
+        app.MapOpenApi();
+        app.MapScalarApiReference();
 
         // 2. Health Check (Railway deployment verification)
         app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
