@@ -29,9 +29,9 @@ Currently, the project has CI (Continuous Integration) pipelines that validate c
 - **Robust Verification**: Implement wait-and-verify logic to poll deployment status after trigger, ensuring only successful deployments are tagged
 
 ### Versioning & Release
-- **Automatic versioning**: Automatically increment version numbers based on semantic commit types (feat: = minor, fix: = patch, BREAKING = major)
-- **Changelog generation**: Automatically generate CHANGELOG.md entries from semantic commit messages since last release
-- **Git tagging**: Automatically create and push git tags for each deployed version using `GITHUB_TOKEN` (e.g., `notification-service/v1.3.0`)
+- **Automatic versioning**: Use `Versionize` (.NET tool) to increment version numbers based on semantic commit types
+- **Changelog generation**: Automatically generate `CHANGELOG.md` entries using `Versionize`
+- **Git tagging**: Use `Versionize` to create and push git tags (e.g., `notification-service/v1.3.0`)
 - **First release handling**: Gracefully handle initial deployment when no previous tags exist
 
 ### Scalability & Onboarding
@@ -44,10 +44,8 @@ Currently, the project has CI (Continuous Integration) pipelines that validate c
 - `ci-pipeline` (add CD requirements, health check, concurrency, rollback)
 
 ### Affected Code
-- `.github/workflows/template-dotnet-ci.yml` (extend with deployment, versioning, tagging jobs)
+- `.github/workflows/template-dotnet-ci.yml` (install and run `Versionize`)
 - `.github/workflows/*-service-ci.yml` (add path filters, permissions, secrets passing)
-- `.github/scripts/bump-version.sh` (new script for semantic versioning)
-- `.github/scripts/generate-changelog.sh` (new script for changelog generation)
 - `railway.json` files per service (with JSON schema)
 - Service `.csproj` files (add/update `<Version>` property)
 - Service `Bootstrap/ServiceBootstrap.cs` files (add health endpoint)
