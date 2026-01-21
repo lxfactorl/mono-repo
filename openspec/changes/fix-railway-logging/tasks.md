@@ -2,9 +2,10 @@
 
 ## 1. Implementation
 - [x] 1.1 Update `appsettings.json` with Serilog `Using` configuration.
-- [x] 1.2 Update `appsettings.json` to output structured JSON using `ExpressionTemplate`.
-- [x] 1.3 Verify locally that logs are valid JSON objects and contain all custom properties.
+- [x] 1.2 Add `Serilog.Formatting.Compact` package.
+- [x] 1.3 Update `appsettings.json` to use `RenderedCompactJsonFormatter`.
+- [x] 1.4 Verify locally that logs are valid Compact JSON (CLEF).
 
 ## 2. Validation
 - [ ] 2.1 Deploy to Railway.
-- [ ] 2.2 Confirm that logs appear in the Railway dashboard with indexed "Attributes" (verifying structured logging).
+- [ ] 2.2 Confirm that logs are parsed correctly and attributes are indexed.
