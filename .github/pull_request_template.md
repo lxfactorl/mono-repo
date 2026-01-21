@@ -1,8 +1,8 @@
-# Summary for <!-- id: add-pr-template -->
+# Summary for <!-- id: <change-id> -->
 <!-- Provide a brief overview of the changes and the OpenSpec ID (e.g. openspec/changes/my-change) -->
 
 ## Linked Issue
-<!-- Link to the related GitHub Issue, e.g. Relates to #123 -->
+Relates to #<!-- Link to the related GitHub Issue -->
 
 ## Type of Change
 - [ ] Bug fix
