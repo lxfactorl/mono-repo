@@ -5,6 +5,7 @@ using NotificationService.Api.Endpoints;
 using NotificationService.Api.Models.Settings;
 using NotificationService.Infrastructure.Common;
 using NotificationService.Infrastructure.Middleware;
+using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -20,6 +21,15 @@ public static class ServiceBootstrap
         builder.Host.UseSerilog((context, loggerConfiguration) =>
         {
             loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+        });
+
+        // 1.1 Proxy Support (Critical for Railway/Container environments)
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // Railway uses dynamic internal IPs, so we must clear these checks to trust the incoming headers
+            options.KnownIPNetworks.Clear();
+            options.KnownProxies.Clear();
         });
 
         // 2. Exception Handling
@@ -57,6 +67,9 @@ public static class ServiceBootstrap
     public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
+
+        // 0. Forwarded Headers (Must be first to correctly identify scheme/IP)
+        app.UseForwardedHeaders();
 
         // 1. Exception Handling (must be early in pipeline)
         app.UseExceptionHandler();
