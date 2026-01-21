@@ -1,21 +1,20 @@
 # Design: Railway Logging Configuration Fix
 
 ## Context
-Railway captures logs from the standard output (stdout) and standard error (stderr) of the running container. For .NET applications using Serilog, this requires the `Serilog.Sinks.Console` to be correctly configured and the `Serilog.Expressions` formatter to be properly initialized.
+Railway captures logs from stdout. For .NET applications using Serilog, this requires the `Serilog.Sinks.Console` to be correctly configured and the `Serilog.Expressions` formatter to be properly initialized with a valid template.
 
 ## Goals
-- Ensure all application logs (Information level and above) are visible in the Railway dashboard.
-- Maintain structured log format using `ExpressionTemplate`.
+- Ensure all application logs are visible in the Railway dashboard.
+- Ensure logs are readable and correctly formatted.
 
 ## Decisions
 ### 1. Mandatory 'Using' Block
-Serilog's configuration-based initialization requires the assembly names to be explicitly listed in the `Using` block if they are not automatically discovered.
-**Decision**: Add `Serilog.Sinks.Console` and `Serilog.Expressions` to the `Using` array in `appsettings.json`.
+Add `Serilog.Sinks.Console` and `Serilog.Expressions` to the `Using` array in `appsettings.json`.
 
-### 2. Correct ExpressionTemplate Syntax
-The previous template syntax contained nested braces that could cause parsing issues or incorrect output.
-**Decision**: Simplify the template to `{@t: @t, @l: @l, @m: @m, ..@p}\n` which is the standard format for `Serilog.Expressions` to output a flat JSON-like structure that Railway can parse.
+### 2. Robust ExpressionTemplate Syntax
+The previously tried template syntax produced mangled output.
+**Decision**: Use the standard bracketed syntax for the `ExpressionTemplate`:
+`"{@t:yyyy-MM-dd HH:mm:ss.fff zzz} [{@l:u3}] {@m}\n{@p}\n{@x}"`
 
 ## Risks / Trade-offs
-- **Risk**: Overly verbose logging could increase Railway usage costs (if logging is billed by volume).
-- **Mitigation**: Keep the default level as `Information` and only log critical path events.
+- Detailed timestamps and levels increase log volume slightly but are essential for troubleshooting.
