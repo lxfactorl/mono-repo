@@ -13,4 +13,4 @@ A single archived change (`add-ci-quality-gates`) was incorrectly placed in `ope
 - Affected code: None (documentation/metadata only)
 
 ## Linked Issue
-Relates to #92
+Relates to #104
